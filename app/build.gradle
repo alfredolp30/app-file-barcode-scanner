@@ -34,6 +34,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-ml-vision:19.0.2'
     implementation 'com.google.firebase:firebase-core:16.0.7'
     implementation 'com.github.barteksc:pdfium-android:1.9.0'
+    implementation 'com.izettle:html2bitmap:1.6'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.2-alpha01'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.2-alpha01'

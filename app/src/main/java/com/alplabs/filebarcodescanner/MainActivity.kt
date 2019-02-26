@@ -12,19 +12,13 @@ import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import kotlinx.android.synthetic.main.activity_main.*
-import java.lang.Exception
-import com.shockwave.pdfium.PdfiumCore
 import android.graphics.Bitmap
-import android.media.MediaFormat
-import android.print.PrintAttributes
-import android.print.pdf.PrintedPdfDocument
-import android.text.Html
-import android.webkit.WebView
-import androidx.documentfile.provider.DocumentFile
+import android.media.Image
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
+import kotlin.Exception
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), AsyncHtml2Bitmap.Listener, AsyncPdf2Bitmap.Listener {
 
     companion object {
 
@@ -109,23 +103,11 @@ class MainActivity : AppCompatActivity() {
             }
 
             "jpeg", "png", "jpg", "bmp" -> {
-
-                try {
-
-                    val image = FirebaseVisionImage.fromFilePath(this, uri)
-                    scannerBarcode(image)
-
-                } catch (e: Exception) {
-
-                    Log.e("FILE_REQ_SUCCESS", "Exception firebase", e)
-                }
-
+                scannerBarcode(uri)
             }
 
             "htm" -> {
-
                 html2Bitmap(uri)
-
             }
 
             else -> {
@@ -137,56 +119,76 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun pdf2Bitmap(pdfUri: Uri) {
-        val fd = contentResolver.openFileDescriptor(pdfUri, "r")
-        val core = PdfiumCore(this)
-
-        try {
-            val pdfDocument = core.newDocument(fd)
-
-            val pageCount = core.getPageCount(pdfDocument)
-
-            for (page in 0 until pageCount) {
-
-                core.openPage(pdfDocument, page)
-
-                val width = core.getPageWidthPoint(pdfDocument, page)
-                val height = core.getPageHeightPoint(pdfDocument, page)
-
-                val bitmap = Bitmap.createBitmap(
-                    width, height,
-                    Bitmap.Config.ARGB_8888
-                )
-
-                core.renderPageBitmap(
-                    pdfDocument, bitmap, page, 0, 0,
-                    width, height
-                )
-
-                val image = FirebaseVisionImage.fromBitmap(bitmap)
-
-                scannerBarcode(image)
-            }
-        } catch (e: Exception) {
-
-        }
+        AsyncPdf2Bitmap(this, this).execute(pdfUri)
     }
 
+    override fun onFinishPdf2Bitmap(bitmaps: List<Bitmap>) {
+
+        bitmaps.forEach {
+            scannerBarcode(it)
+        }
+
+    }
 
 
     private fun html2Bitmap(htmlUri: Uri) {
-        val htmlData = contentResolver.openInputStream(htmlUri)?.reader()?.readText() ?: ""
+        AsyncHtml2Bitmap(this, this).execute(htmlUri)
+    }
 
-        Log.d("html2Bitmap", htmlData)
+    override fun onFinishHtml2Bitmap(bitmap: Bitmap?) {
+
+        if (bitmap != null) {
+
+            scannerBarcode(bitmap)
+
+        }
+
+    }
+
+    private fun scannerBarcode(uri: Uri) {
+
+        try {
+
+            val image = FirebaseVisionImage.fromFilePath(this, uri)
+
+            scannerBarcode(image)
+
+        } catch (e: Exception) {
+
+            Log.e("scannerBarcode", "Error create FirebaseVisionImage", e)
+
+        }
+
     }
 
 
+    private fun scannerBarcode(bitmap: Bitmap) {
+
+        try {
+
+            val image = FirebaseVisionImage.fromBitmap(bitmap)
+
+            scannerBarcode(image)
+
+        } catch (e: Exception) {
+
+            Log.e("scannerBarcode", "Error create FirebaseVisionImage", e)
+
+        }
+
+    }
+
 
     private fun scannerBarcode(image: FirebaseVisionImage) {
-        val options = FirebaseVisionBarcodeDetectorOptions.Builder().setBarcodeFormats(
-            FirebaseVisionBarcode.FORMAT_ALL_FORMATS
-        ).build()
+        val options = FirebaseVisionBarcodeDetectorOptions.Builder()
+            .setBarcodeFormats(FirebaseVisionBarcode.FORMAT_ALL_FORMATS)
+            .build()
 
-        val detector = FirebaseVision.getInstance().getVisionBarcodeDetector(options)
+        val firebaseVision = FirebaseVision.getInstance()
+
+        firebaseVision.isStatsCollectionEnabled = true
+
+        val detector = firebaseVision.getVisionBarcodeDetector(options)
 
         detector.detectInImage(image)
             .addOnSuccessListener { barcodes ->
