@@ -1,32 +1,34 @@
-package com.alplabs.filebarcodescanner
+package com.alplabs.filebarcodescanner.scanner
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.AsyncTask
+import android.util.DisplayMetrics
 import android.util.Log
 import com.shockwave.pdfium.PdfiumCore
+import java.io.File
 import java.lang.ref.WeakReference
 
 /**
  * Created by Alfredo L. Porfirio on 26/02/19.
  * Copyright Universo Online 2019. All rights reserved.
  */
-class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<Uri, Unit, List<Bitmap>>() {
+class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<Uri, Unit, List<Uri>>() {
 
     interface Listener {
-        fun onFinishPdf2Bitmap(bitmaps: List<Bitmap>)
+        fun onFinishPdf2Bitmap(uris: List<Uri>)
     }
 
     private val weakContext = WeakReference(context)
 
     private val weakListener = WeakReference(listener)
 
-    override fun doInBackground(vararg params: Uri?): List<Bitmap> {
+    override fun doInBackground(vararg params: Uri?): List<Uri> {
         val uri = params[0]
 
         val ctx = weakContext.get()
-        val bitmaps = mutableListOf<Bitmap>()
+        val outputUris = mutableListOf<Uri>()
 
         if (uri != null && ctx != null) {
             val fd = ctx.contentResolver.openFileDescriptor(uri, "r")
@@ -41,10 +43,14 @@ class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<Uri, Uni
 
                     core.openPage(pdfDocument, page)
 
-                    val width = core.getPageWidthPoint(pdfDocument, page)
-                    val height = core.getPageHeightPoint(pdfDocument, page)
+                    val width = core.getPageWidth(pdfDocument, page)
+                    val height = core.getPageHeight(pdfDocument, page)
+
+                    val metrics = DisplayMetrics()
+                    metrics.setToDefaults()
 
                     val bitmap = Bitmap.createBitmap(
+                        metrics,
                         width, height,
                         Bitmap.Config.ARGB_8888
                     )
@@ -54,7 +60,11 @@ class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<Uri, Uni
                         width, height
                     )
 
-                    bitmaps.add(bitmap)
+                    val file = File(ctx.cacheDir, "temp$page.png")
+
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, file.outputStream())
+
+                    outputUris.add(Uri.fromFile(file))
                 }
 
                 core.closeDocument(pdfDocument)
@@ -64,11 +74,11 @@ class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<Uri, Uni
             }
         }
 
-        return bitmaps
+        return outputUris
     }
 
 
-    override fun onPostExecute(result: List<Bitmap>?) {
+    override fun onPostExecute(result: List<Uri>?) {
         super.onPostExecute(result)
 
         if (result != null) {

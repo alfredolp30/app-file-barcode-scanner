@@ -8,7 +8,6 @@ object ActivityRequestCode {
 
     private var requestCode: Int = 1
 
-
     fun nextRequestCode() = requestCode++
 
 }
