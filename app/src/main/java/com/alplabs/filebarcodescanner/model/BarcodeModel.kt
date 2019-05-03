@@ -8,12 +8,12 @@ import android.os.Parcelable
  * Created by Alfredo L. Porfirio on 01/03/19.
  * Copyright Universo Online 2019. All rights reserved.
  */
-class BarcodeModel(val rawValue: String) : Parcelable {
+class BarcodeModel(val displayValue: String) : Parcelable {
 
     constructor(parcel: Parcel) : this(parcel.readString() ?: "")
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(rawValue)
+        parcel.writeString(displayValue)
     }
 
     override fun describeContents(): Int {

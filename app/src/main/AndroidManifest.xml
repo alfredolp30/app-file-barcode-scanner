@@ -14,7 +14,6 @@
             android:theme="@style/AppTheme">
         <activity
                 android:name=".BarcodeActivity"
-                android:label="@string/title_activity_barcode"
                 android:theme="@style/AppTheme.NoActionBar">
 
             <intent-filter>

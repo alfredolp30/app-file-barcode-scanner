@@ -28,12 +28,12 @@ class BarcodeAdapter(val barcodesModel: MutableList<BarcodeModel>, listener: Lis
 
     override fun onBindViewHolder(holder: BarcodeViewHolder, position: Int) {
 
-        val rawValue = barcodesModel[position].rawValue
+        val displayValue = barcodesModel[position].displayValue
 
-        holder.txtRawBarcode.text = rawValue
+        holder.txtRawBarcode.text = displayValue
 
         holder.imgBtnShare?.setOnClickListener {
-            weakListener.get()?.onShare(rawValue = rawValue)
+            weakListener.get()?.onShare(rawValue = displayValue)
         }
     }
 }

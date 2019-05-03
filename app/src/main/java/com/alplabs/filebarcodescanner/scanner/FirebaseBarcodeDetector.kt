@@ -16,14 +16,12 @@ import java.lang.ref.WeakReference
  */
 class FirebaseBarcodeDetector(listener: Listener) {
 
-    var countUris: Int = 0
-
-    val barcodesModel = mutableListOf<BarcodeModel>()
-
-    val weakListener = WeakReference(listener)
+    private var countUris: Int = 0
+    private val barcodeModels = mutableListOf<BarcodeModel>()
+    private val weakListener = WeakReference(listener)
 
     interface Listener {
-        fun onDetectorSuccess(barcodesModel: List<BarcodeModel>)
+        fun onDetectorSuccess(barcodeModels: List<BarcodeModel>)
         fun onDetectorFailure()
     }
 
@@ -38,7 +36,7 @@ class FirebaseBarcodeDetector(listener: Listener) {
 
         countUris = uris.count()
 
-        barcodesModel.clear()
+        barcodeModels.clear()
 
         uris.forEach { uri ->
 
@@ -51,16 +49,16 @@ class FirebaseBarcodeDetector(listener: Listener) {
 
                         Log.d("SCANNER_BARCODE", "" + barcodes)
 
-                        barcodes.mapTo(barcodesModel) { BarcodeModel(it.rawValue ?: "") }
+                        barcodes.mapTo(barcodeModels) { BarcodeModel(it.displayValue ?: "") }
 
                         if (--countUris == 0) {
-                            weakListener.get()?.onDetectorSuccess(barcodesModel)
+                            weakListener.get()?.onDetectorSuccess(barcodeModels)
                         }
                     }
 
                     .addOnFailureListener {
-                        Log.e( "SCANNER_BARCODE", it.message)
 
+                        Log.e( "SCANNER_BARCODE", it.message)
 
                         if (--countUris == 0) {
                             weakListener.get()?.onDetectorFailure()
