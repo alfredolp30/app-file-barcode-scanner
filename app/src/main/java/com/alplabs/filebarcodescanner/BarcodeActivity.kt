@@ -6,20 +6,18 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
-import com.alplabs.filebarcodescanner.fragment.BarcodesFragment
-import com.alplabs.filebarcodescanner.fragment.ErrorFragment
-import com.alplabs.filebarcodescanner.fragment.ErrorType
+import com.alplabs.filebarcodescanner.fragment.BarcodeFragment
+import com.alplabs.filebarcodescanner.fragment.InitialFragment
 import com.alplabs.filebarcodescanner.fragment.ProgressFragment
 import com.alplabs.filebarcodescanner.model.BarcodeModel
 
 import kotlinx.android.synthetic.main.activity_barcode.*
 
-class BarcodeActivity : AppCompatActivity(), ProgressFragment.Listener {
+class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
 
     companion object {
 
-        val FILE_REQUEST_CODE = ActivityRequestCode.nextRequestCode()
+        val FILE_REQUEST_CODE = nextRequestCode()
 
     }
 
@@ -28,10 +26,7 @@ class BarcodeActivity : AppCompatActivity(), ProgressFragment.Listener {
         setContentView(R.layout.activity_barcode)
         setSupportActionBar(toolbar)
 
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.frame, ErrorFragment.newInstance(ErrorType.INIT))
-            .commit()
+        showInitialFragment()
 
         fab.setOnClickListener {
             pickerFile()
@@ -82,28 +77,57 @@ class BarcodeActivity : AppCompatActivity(), ProgressFragment.Listener {
     }
 
     private fun fileSuccess(uri: Uri) {
+        showProgressFragment(uri)
+    }
+
+
+    override fun onBarcodeScannerSuccess(barcodeModels: List<BarcodeModel>) {
+
+
+        if (barcodeModels.isEmpty()) {
+
+            showToast(getString(R.string.not_found_barcode))
+
+        } else {
+
+            showBarcodeFragment(barcodeModels)
+
+        }
+    }
+
+    private fun showInitialFragment() {
+
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.frame, InitialFragment())
+            .commit()
+
+    }
+
+
+    private fun showProgressFragment(uri: Uri) {
+
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.frame, ProgressFragment.newInstance(uri))
             .commit()
+
     }
 
 
-    override fun onBarcodeScannerSuccess(barcodesModel: List<BarcodeModel>) {
+    private fun showBarcodeFragment(barcodeModels: List<BarcodeModel>) {
+
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.frame, BarcodesFragment.newInstance(barcodesModel))
+            .replace(R.id.frame, BarcodeFragment.newInstance(barcodeModels))
             .commit()
 
-        barcodesModel.forEach {
-            Log.i("RAW_VALUE", it.rawValue)
-        }
     }
+
 
     override fun onBarcodeScannerError() {
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.frame, ErrorFragment.newInstance(ErrorType.DURANT_LOADING))
-            .commit()
+
+        showToast(getString(R.string.unknown_error))
+
     }
 }

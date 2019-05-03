@@ -5,7 +5,6 @@
               android:layout_height="wrap_content" android:padding="16dp" android:gravity="center_vertical">
 
     <TextView
-            android:text="TextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/txtRawBarcode"
@@ -13,7 +12,9 @@
             android:textIsSelectable="true" android:layout_weight="1"/>
     <ImageButton
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" app:srcCompat="@android:drawable/ic_menu_share"
-            android:id="@+id/imgBtnShare" android:layout_marginStart="16dp"/>
+            android:layout_height="wrap_content" app:srcCompat="@drawable/ic_share"
+            android:id="@+id/imgBtnShare" android:layout_marginStart="16dp"
+            android:background="?attr/selectableItemBackground"
+            android:tint="@color/colorPrimary"/>
 
 </LinearLayout>

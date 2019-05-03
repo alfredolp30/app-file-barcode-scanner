@@ -11,4 +11,10 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+    <string name="unknown_error">Unknown error.</string>
+    <string name="processing_file">Processing file.</string>
+    <string name="not_found_barcode">Not found barcode in file.</string>
+    <string name="initial">Read barcode from file.</string>
 </resources>

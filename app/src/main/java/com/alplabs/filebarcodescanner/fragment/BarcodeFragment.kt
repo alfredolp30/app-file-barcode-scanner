@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.fragment_barcodes.view.*
 
 private const val BARCODE = "barcode"
 
-class BarcodesFragment : Fragment(), BarcodeAdapter.Listener {
+class BarcodeFragment : Fragment(), BarcodeAdapter.Listener {
 
     private val adapter = BarcodeAdapter(mutableListOf(), this)
 
@@ -72,11 +72,11 @@ class BarcodesFragment : Fragment(), BarcodeAdapter.Listener {
 
     companion object {
         @JvmStatic
-        fun newInstance(barcodesModel: List<BarcodeModel>) =
+        fun newInstance(barcodeModels: List<BarcodeModel>) =
 
-            BarcodesFragment().apply {
+            BarcodeFragment().apply {
                 arguments = Bundle().apply {
-                    putParcelableArray(BARCODE, barcodesModel.toTypedArray())
+                    putParcelableArray(BARCODE, barcodeModels.toTypedArray())
                 }
             }
 

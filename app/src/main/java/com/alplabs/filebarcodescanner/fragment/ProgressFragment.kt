@@ -65,7 +65,7 @@ class ProgressFragment : Fragment(), AsyncHtml2Bitmap.Listener,
 
 
     interface Listener {
-        fun onBarcodeScannerSuccess(barcodesModel: List<BarcodeModel>)
+        fun onBarcodeScannerSuccess(barcodeModels: List<BarcodeModel>)
         fun onBarcodeScannerError()
     }
 
@@ -126,7 +126,7 @@ class ProgressFragment : Fragment(), AsyncHtml2Bitmap.Listener,
     }
 
 
-    fun scannerBarcode(uris: List<Uri>) {
+    private fun scannerBarcode(uris: List<Uri>) {
         detector.scanner(requireContext(), uris)
     }
 
