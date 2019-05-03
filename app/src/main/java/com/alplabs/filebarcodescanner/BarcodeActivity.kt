@@ -13,7 +13,7 @@ import com.alplabs.filebarcodescanner.model.BarcodeModel
 
 import kotlinx.android.synthetic.main.activity_barcode.*
 
-class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
+open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
 
     companion object {
 
@@ -33,11 +33,22 @@ class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
         }
 
 
-        if (intent?.action == Intent.ACTION_SEND) {
-            (intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let {
-                fileSuccess(it)
+        when (intent?.action) {
+            Intent.ACTION_VIEW -> {
+
+                intent?.data?.let {
+                    openFile(it)
+                }
+
+            }
+
+            Intent.ACTION_SEND -> {
+                (intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let {
+                    openFile(it)
+                }
             }
         }
+
     }
 
 
@@ -62,7 +73,7 @@ class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
                 if (resultCode == Activity.RESULT_OK) {
 
                     data?.data?.also { uri ->
-                        fileSuccess(uri)
+                        openFile(uri)
                     }
 
                 } else {
@@ -76,7 +87,7 @@ class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
         }
     }
 
-    private fun fileSuccess(uri: Uri) {
+    private fun openFile(uri: Uri) {
         showProgressFragment(uri)
     }
 
@@ -87,6 +98,7 @@ class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
         if (barcodeModels.isEmpty()) {
 
             showToast(getString(R.string.not_found_barcode))
+            showInitialFragment()
 
         } else {
 
@@ -131,3 +143,6 @@ class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
 
     }
 }
+
+
+class BarcodeSendActivity : BarcodeActivity()
