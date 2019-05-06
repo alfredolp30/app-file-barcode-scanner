@@ -12,13 +12,14 @@ import android.webkit.MimeTypeMap
 import com.alplabs.filebarcodescanner.scanner.AsyncHtml2Bitmap
 import com.alplabs.filebarcodescanner.scanner.AsyncPdf2Bitmap
 import com.alplabs.filebarcodescanner.R
+import com.alplabs.filebarcodescanner.metrics.CALog
 import com.alplabs.filebarcodescanner.model.BarcodeModel
 import com.alplabs.filebarcodescanner.scanner.FirebaseBarcodeDetector
 import java.lang.ref.WeakReference
 
 private const val FILE_URI = "file_uri"
 
-class ProgressFragment : Fragment(), AsyncHtml2Bitmap.Listener,
+class ProgressFragment : BaseFragment(), AsyncHtml2Bitmap.Listener,
     AsyncPdf2Bitmap.Listener, FirebaseBarcodeDetector.Listener {
 
     private var listener: WeakReference<Listener>? = null
@@ -86,7 +87,7 @@ class ProgressFragment : Fragment(), AsyncHtml2Bitmap.Listener,
 
         val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(requireContext().contentResolver.getType(uri))
 
-        Log.i("FILE_REQ_SUCCESS", "Uri: $uri extension: $extension")
+        CALog.i("FILE_REQ_SUCCESS", "Uri: $uri extension: $extension")
 
         when (extension) {
             "pdf" -> {
@@ -102,7 +103,7 @@ class ProgressFragment : Fragment(), AsyncHtml2Bitmap.Listener,
             }
 
             else -> {
-                Log.e("FILE_REQ_SUCCESS", "Not supported file extension")
+                CALog.e("FILE_REQ_SUCCESS", "Not supported file extension")
             }
         }
     }
@@ -130,8 +131,8 @@ class ProgressFragment : Fragment(), AsyncHtml2Bitmap.Listener,
         detector.scanner(requireContext(), uris)
     }
 
-    override fun onDetectorSuccess(barcodesModel: List<BarcodeModel>) {
-        listener?.get()?.onBarcodeScannerSuccess(barcodesModel)
+    override fun onDetectorSuccess(barcodeModels: List<BarcodeModel>) {
+        listener?.get()?.onBarcodeScannerSuccess(barcodeModels)
     }
 
     override fun onDetectorFailure() {

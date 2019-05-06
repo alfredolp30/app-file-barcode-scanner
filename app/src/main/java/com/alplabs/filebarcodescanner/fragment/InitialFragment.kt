@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.alplabs.filebarcodescanner.R
 
-class InitialFragment : Fragment() {
+class InitialFragment : BaseFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

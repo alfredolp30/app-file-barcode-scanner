@@ -22,4 +22,7 @@ open class BaseActivity : AppCompatActivity() {
         Toast.makeText(this, msg, duration).show()
     }
 
+
+    val appBarcode get() = application as? AppBarcode
+
 }

@@ -9,6 +9,7 @@ import android.util.Log
 import com.alplabs.filebarcodescanner.fragment.BarcodeFragment
 import com.alplabs.filebarcodescanner.fragment.InitialFragment
 import com.alplabs.filebarcodescanner.fragment.ProgressFragment
+import com.alplabs.filebarcodescanner.metrics.CALog
 import com.alplabs.filebarcodescanner.model.BarcodeModel
 
 import kotlinx.android.synthetic.main.activity_barcode.*
@@ -29,6 +30,9 @@ open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
         showInitialFragment()
 
         fab.setOnClickListener {
+
+            appBarcode?.analytics?.eventSelectContent("new_file")
+
             pickerFile()
         }
 
@@ -77,12 +81,12 @@ open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
                     }
 
                 } else {
-                    Log.w("PICKER_FILE", "cancelled")
+                    CALog.i("PICKER_FILE", "cancelled")
                 }
             }
 
             else -> {
-                Log.e("PICKER_FILE", "not found request code")
+                CALog.e("PICKER_FILE", "not found request code")
             }
         }
     }

@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.AsyncTask
 import android.util.DisplayMetrics
 import android.util.Log
+import com.alplabs.filebarcodescanner.metrics.CALog
 import com.shockwave.pdfium.PdfiumCore
 import java.io.File
 import java.lang.ref.WeakReference
@@ -70,7 +71,7 @@ class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<Uri, Uni
                 core.closeDocument(pdfDocument)
 
             } catch (e: Exception) {
-                Log.e("pdf2Bitmap", "Error convert", e)
+                CALog.e("pdf2Bitmap", "Error convert", e)
             }
         }
 

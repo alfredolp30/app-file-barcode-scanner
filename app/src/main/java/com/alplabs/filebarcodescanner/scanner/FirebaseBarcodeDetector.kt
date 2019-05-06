@@ -3,6 +3,7 @@ package com.alplabs.filebarcodescanner.scanner
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import com.alplabs.filebarcodescanner.metrics.CALog
 import com.alplabs.filebarcodescanner.model.BarcodeModel
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
@@ -47,7 +48,7 @@ class FirebaseBarcodeDetector(listener: Listener) {
                 detector.detectInImage(image)
                     .addOnSuccessListener { barcodes ->
 
-                        Log.d("SCANNER_BARCODE", "" + barcodes)
+                        CALog.d("SCANNER_BARCODE", "" + barcodes)
 
                         barcodes.mapTo(barcodeModels) { BarcodeModel(it.displayValue ?: "") }
 
@@ -58,7 +59,7 @@ class FirebaseBarcodeDetector(listener: Listener) {
 
                     .addOnFailureListener {
 
-                        Log.e( "SCANNER_BARCODE", it.message)
+                        CALog.e( "SCANNER_BARCODE", it.message)
 
                         if (--countUris == 0) {
                             weakListener.get()?.onDetectorFailure()
@@ -67,7 +68,7 @@ class FirebaseBarcodeDetector(listener: Listener) {
 
             } catch (e: Exception) {
 
-                Log.e("scannerBarcode", "Error", e)
+                CALog.e("scannerBarcode", "Error", e)
 
             }
         }

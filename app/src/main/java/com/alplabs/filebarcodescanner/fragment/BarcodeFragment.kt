@@ -11,12 +11,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.alplabs.filebarcodescanner.R
 import com.alplabs.filebarcodescanner.adapter.BarcodeAdapter
 import com.alplabs.filebarcodescanner.model.BarcodeModel
+import com.crashlytics.android.Crashlytics
 import kotlinx.android.synthetic.main.fragment_barcodes.view.*
 
 
 private const val BARCODE = "barcode"
 
-class BarcodeFragment : Fragment(), BarcodeAdapter.Listener {
+class BarcodeFragment : BaseFragment(), BarcodeAdapter.Listener {
 
     private val adapter = BarcodeAdapter(mutableListOf(), this)
 
@@ -45,30 +46,16 @@ class BarcodeFragment : Fragment(), BarcodeAdapter.Listener {
 
     override fun onShare(rawValue: String) {
 
-        val sharingIntent = Intent(Intent.ACTION_SEND)
-        sharingIntent.type = "text/plain"
-        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, rawValue)
-        startActivity(Intent.createChooser(sharingIntent, "Share with"))
+        Intent(Intent.ACTION_SEND).apply {
+            this.type = "text/plain"
+            this.putExtra(Intent.EXTRA_TEXT, rawValue)
+
+            startActivity(Intent.createChooser(this, "Share with"))
+        }
+
 
     }
 
-//    override fun onAttach(context: Context) {
-//        super.onAttach(context)
-//        if (context is OnFragmentInteractionListener) {
-//            listener = context
-//        } else {
-//            throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
-//        }
-//    }
-//
-//    overrid22qe fun onDetach() {
-//        super.onDetach()
-//        listener = null
-//    }
-
-//    interface OnFragmentInteractionListener {
-//        fun onFragmentInteraction(uri: Uri)
-//    }
 
     companion object {
         @JvmStatic
