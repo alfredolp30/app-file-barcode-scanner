@@ -12,7 +12,7 @@ class AppBarcode : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        CALog.d(AppBarcode::onCreate.name, "Init application")
+        CALog.d(AppBarcode::onCreate.name, "init application")
     }
 
     val analytics: CAAnalytics by lazy { CAAnalytics(applicationContext) }
