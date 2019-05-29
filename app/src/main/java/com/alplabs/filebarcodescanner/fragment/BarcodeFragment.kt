@@ -1,6 +1,9 @@
 package com.alplabs.filebarcodescanner.fragment
 
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -18,6 +21,9 @@ import kotlinx.android.synthetic.main.fragment_barcodes.view.*
 private const val BARCODE = "barcode"
 
 class BarcodeFragment : BaseFragment(), BarcodeAdapter.Listener {
+
+
+    private val clipboardManager get() = context?.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
 
     private val adapter = BarcodeAdapter(mutableListOf(), this)
 
@@ -44,16 +50,10 @@ class BarcodeFragment : BaseFragment(), BarcodeAdapter.Listener {
         return view
     }
 
-    override fun onShare(rawValue: String) {
+    override fun onCopy(rawValue: String) {
+        clipboardManager?.primaryClip = ClipData.newPlainText("barcode", rawValue)
 
-        Intent(Intent.ACTION_SEND).apply {
-            this.type = "text/plain"
-            this.putExtra(Intent.EXTRA_TEXT, rawValue)
-
-            startActivity(Intent.createChooser(this, "Share with"))
-        }
-
-
+        baseActivity?.showToast(getString(R.string.barcode_copy_success))
     }
 
 

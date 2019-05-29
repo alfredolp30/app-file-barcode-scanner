@@ -11,5 +11,5 @@ import kotlinx.android.synthetic.main.cell_barcode.view.*
  */
 class BarcodeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     val txtRawBarcode = view.txtRawBarcode
-    val imgBtnShare = view.imgBtnShare
+    val imgBtnCopy = view.imgBtnCopy
 }

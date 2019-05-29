@@ -4,12 +4,16 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.AsyncTask
+import android.provider.DocumentsContract
 import android.util.DisplayMetrics
 import android.util.Log
 import com.alplabs.filebarcodescanner.metrics.CALog
 import com.shockwave.pdfium.PdfiumCore
 import java.io.File
 import java.lang.ref.WeakReference
+import android.provider.OpenableColumns
+
+
 
 /**
  * Created by Alfredo L. Porfirio on 26/02/19.
@@ -32,6 +36,8 @@ class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<Uri, Uni
         val outputUris = mutableListOf<Uri>()
 
         if (uri != null && ctx != null) {
+
+            val fileId = getFileId(uri)
             val fd = ctx.contentResolver.openFileDescriptor(uri, "r")
             val core = PdfiumCore(ctx)
 
@@ -40,7 +46,19 @@ class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<Uri, Uni
 
                 val pageCount = core.getPageCount(pdfDocument)
 
+                CALog.i("PDF2Bitmap", "page count $pageCount")
+
                 for (page in 0 until pageCount) {
+
+                    val file = File(ctx.cacheDir, "$fileId-$page.png")
+
+                    if (file.exists()) {
+                        outputUris.add(Uri.fromFile(file))
+                        CALog.i("PDF2Bitmap", "file exits with id $fileId and page $page")
+                        continue
+                    }
+
+                    CALog.d("PDF2Bitmap", "init page $page")
 
                     core.openPage(pdfDocument, page)
 
@@ -61,8 +79,6 @@ class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<Uri, Uni
                         width, height
                     )
 
-                    val file = File(ctx.cacheDir, "temp$page.png")
-
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, file.outputStream())
 
                     outputUris.add(Uri.fromFile(file))
@@ -71,7 +87,7 @@ class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<Uri, Uni
                 core.closeDocument(pdfDocument)
 
             } catch (e: Exception) {
-                CALog.e("pdf2Bitmap", "Error convert", e)
+                CALog.e("PDF2Bitmap", "error convert", e)
             }
         }
 
@@ -87,5 +103,8 @@ class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<Uri, Uni
         }
 
     }
+
+
+    private fun getFileId(uri: Uri): String = DocumentsContract.getDocumentId(uri)
 
 }

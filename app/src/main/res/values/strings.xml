@@ -1,20 +1,11 @@
 <resources>
-    <string name="app_name">File Barcode Scanner</string>
+    <string name="app_name">Facilitador de Boletos</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_home_fragment">Home fragment</string>
-    <string name="hello_settings_fragment">Settings fragment</string>
-    <string name="title_activity_barcode">BarcodeActivity</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
-
-    <string name="unknown_error">Unknown error.</string>
-    <string name="processing_file">Processing file.</string>
-    <string name="not_found_barcode">Not found barcode in file.</string>
-    <string name="initial">Read barcode from file.</string>
+    <string name="unknown_error">Erro desconhecido.</string>
+    <string name="processing_file">Analisando documento.</string>
+    <string name="not_found_barcode">Não foi encontrado nenhum código de barras.</string>
+    <string name="initial">Encontre código de barras de boletos.</string>
+    <string name="barcode_copy_success">Copiado com sucesso.</string>
 </resources>

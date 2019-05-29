@@ -61,15 +61,15 @@ class FirebaseBarcodeDetector(listener: Listener) {
 
                         CALog.e( "SCANNER_BARCODE", it.message)
 
-                        if (--countUris == 0) {
-                            weakListener.get()?.onDetectorFailure()
-                        }
+                        weakListener.get()?.onDetectorFailure()
                     }
 
             } catch (e: Exception) {
 
                 CALog.e("scannerBarcode", "Error", e)
 
+
+                weakListener.get()?.onDetectorFailure()
             }
         }
 

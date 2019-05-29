@@ -16,7 +16,7 @@ class BarcodeAdapter(val barcodesModel: MutableList<BarcodeModel>, listener: Lis
     private val weakListener = WeakReference(listener)
 
     interface Listener {
-        fun onShare(rawValue: String)
+        fun onCopy(rawValue: String)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BarcodeViewHolder {
@@ -32,8 +32,8 @@ class BarcodeAdapter(val barcodesModel: MutableList<BarcodeModel>, listener: Lis
 
         holder.txtRawBarcode.text = displayValue
 
-        holder.imgBtnShare?.setOnClickListener {
-            weakListener.get()?.onShare(rawValue = displayValue)
+        holder.imgBtnCopy.setOnClickListener {
+            weakListener.get()?.onCopy(rawValue = displayValue)
         }
     }
 }

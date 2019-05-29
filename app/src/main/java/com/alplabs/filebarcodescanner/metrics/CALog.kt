@@ -2,6 +2,7 @@ package com.alplabs.filebarcodescanner.metrics
 
 import android.util.Log
 import com.crashlytics.android.Crashlytics
+import io.fabric.sdk.android.Fabric
 
 /**
  * Created by Alfredo L. Porfirio on 2019-05-06.
@@ -9,61 +10,40 @@ import com.crashlytics.android.Crashlytics
  */
 object CALog {
 
-    fun d(tag: String, msg: String?, throwable: Throwable? = null) {
 
-        Crashlytics.log(Log.DEBUG, tag, msg)
+    private fun logger(level: Int, tag: String, msg: String?, throwable: Throwable?) {
+        val message = msg ?: ""
 
         if (throwable != null) {
 
-            Log.d(tag, msg, throwable)
+            Log.d(tag, message, throwable)
 
-            Crashlytics.logException(throwable)
+            Fabric.getLogger().log(level, tag, message)
+            Fabric.getLogger().e("EXCEPTION", "", throwable)
 
         } else {
 
-            Log.d(tag, msg)
+            Log.d(tag, message)
 
+            Fabric.getLogger().d(tag, message)
         }
+    }
 
+    fun d(tag: String, msg: String?, throwable: Throwable? = null) {
+        logger(Log.DEBUG, tag, msg, throwable)
     }
 
 
     fun i(tag: String, msg: String?, throwable: Throwable? = null) {
-
-        Crashlytics.log(Log.INFO, tag, msg)
-
-        if (throwable != null) {
-
-            Log.i(tag, msg, throwable)
-
-            Crashlytics.logException(throwable)
-
-        } else {
-
-            Log.i(tag, msg)
-
-        }
-
+        logger(Log.INFO, tag, msg, throwable)
     }
 
+    fun w(tag: String, msg: String?, throwable: Throwable? = null) {
+        logger(Log.WARN, tag, msg, throwable)
+    }
 
     fun e(tag: String, msg: String?, throwable: Throwable? = null) {
-
-        Crashlytics.log(Log.ERROR, tag, msg)
-
-        if (throwable != null) {
-
-            Log.e(tag, msg, throwable)
-
-            Crashlytics.logException(throwable)
-
-        } else {
-
-            Log.e(tag, msg)
-
-        }
-
-
+        logger(Log.ERROR, tag, msg, throwable)
     }
 
 }
