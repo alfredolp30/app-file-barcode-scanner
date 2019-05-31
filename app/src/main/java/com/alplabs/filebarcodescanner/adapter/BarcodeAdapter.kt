@@ -4,16 +4,25 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.alplabs.filebarcodescanner.R
+import com.alplabs.filebarcodescanner.extension.setTextWithValue
 import com.alplabs.filebarcodescanner.model.BarcodeModel
+import kotlinx.android.synthetic.main.cell_barcode.view.*
 import java.lang.ref.WeakReference
+import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Created by Alfredo L. Porfirio on 01/03/19.
  * Copyright Universo Online 2019. All rights reserved.
  */
-class BarcodeAdapter(val barcodesModel: MutableList<BarcodeModel>, listener: Listener) : RecyclerView.Adapter<BarcodeViewHolder>() {
+class BarcodeAdapter(val barcodeModels: MutableList<BarcodeModel>, listener: Listener) : RecyclerView.Adapter<BarcodeViewHolder>() {
 
     private val weakListener = WeakReference(listener)
+
+    private val sdf = SimpleDateFormat("dd/MM/yyyy", Locale("pt", "BR"))
+    private val df = DecimalFormat("#.00")
+
 
     interface Listener {
         fun onCopy(rawValue: String)
@@ -24,16 +33,30 @@ class BarcodeAdapter(val barcodesModel: MutableList<BarcodeModel>, listener: Lis
         return BarcodeViewHolder(view)
     }
 
-    override fun getItemCount(): Int = barcodesModel.count()
+    override fun getItemCount(): Int = barcodeModels.count()
 
     override fun onBindViewHolder(holder: BarcodeViewHolder, position: Int) {
 
-        val displayValue = barcodesModel[position].displayValue
+        val barcodeModel = barcodeModels[position]
 
-        holder.txtRawBarcode.text = displayValue
+        val barcode = barcodeModel.barcode
+        val date = barcodeModel.invoice.date
+        val value = barcodeModel.invoice.value
 
-        holder.imgBtnCopy.setOnClickListener {
-            weakListener.get()?.onCopy(rawValue = displayValue)
+        holder.itemView.txtBarcode.text = barcode
+
+        if (date != null) {
+            holder.itemView.txtDate.text = sdf.format(date.time)
+        } else {
+            holder.itemView.txtDate.setText(R.string.without_date)
+        }
+
+
+
+        holder.itemView.txtValue.text = holder.itemView.context.getString(R.string.value, df.format(value))
+
+        holder.itemView.imgBtnCopy.setOnClickListener {
+            weakListener.get()?.onCopy(rawValue = barcode)
         }
     }
 }

@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.MimeTypeMap
+import com.alplabs.filebarcodescanner.BarcodeActivity
 import com.alplabs.filebarcodescanner.scanner.AsyncHtml2Bitmap
 import com.alplabs.filebarcodescanner.scanner.AsyncPdf2Bitmap
 import com.alplabs.filebarcodescanner.R
@@ -128,7 +129,15 @@ class ProgressFragment : BaseFragment(), AsyncHtml2Bitmap.Listener,
 
 
     private fun scannerBarcode(uris: List<Uri>) {
-        detector.scanner(requireContext(), uris)
+        if (uris.isEmpty()) {
+
+            listener?.get()?.onBarcodeScannerError()
+
+        } else {
+
+            detector.scanner(requireContext(), uris)
+
+        }
     }
 
     override fun onDetectorSuccess(barcodeModels: List<BarcodeModel>) {

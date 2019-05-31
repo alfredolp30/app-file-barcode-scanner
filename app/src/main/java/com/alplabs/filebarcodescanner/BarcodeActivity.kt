@@ -6,6 +6,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.Log
+import android.widget.Toast
+import androidx.fragment.app.FragmentTransaction
 import com.alplabs.filebarcodescanner.fragment.BarcodeFragment
 import com.alplabs.filebarcodescanner.fragment.InitialFragment
 import com.alplabs.filebarcodescanner.fragment.ProgressFragment
@@ -101,7 +103,7 @@ open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
 
         if (barcodeModels.isEmpty()) {
 
-            showToast(getString(R.string.not_found_barcode))
+            showToast(getString(R.string.not_found_barcode), Toast.LENGTH_LONG)
             showInitialFragment()
 
         } else {
@@ -111,10 +113,11 @@ open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
         }
     }
 
-    private fun showInitialFragment() {
+   private fun showInitialFragment() {
 
         supportFragmentManager
             .beginTransaction()
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .replace(R.id.frame, InitialFragment())
             .commit()
 
@@ -125,6 +128,7 @@ open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
 
         supportFragmentManager
             .beginTransaction()
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .replace(R.id.frame, ProgressFragment.newInstance(uri))
             .commit()
 
@@ -135,6 +139,7 @@ open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
 
         supportFragmentManager
             .beginTransaction()
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .replace(R.id.frame, BarcodeFragment.newInstance(barcodeModels))
             .commit()
 
@@ -143,7 +148,9 @@ open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
 
     override fun onBarcodeScannerError() {
 
-        showToast(getString(R.string.unknown_error))
+        showToast(getString(R.string.unknown_error), Toast.LENGTH_LONG)
+
+        showInitialFragment()
 
     }
 }

@@ -2,9 +2,10 @@ package com.alplabs.filebarcodescanner.scanner
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
+import com.alplabs.filebarcodescanner.invoice.InvoiceChecker
 import com.alplabs.filebarcodescanner.metrics.CALog
 import com.alplabs.filebarcodescanner.model.BarcodeModel
+import com.alplabs.filebarcodescanner.invoice.InvoiceCollection
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
@@ -50,7 +51,11 @@ class FirebaseBarcodeDetector(listener: Listener) {
 
                         CALog.d("SCANNER_BARCODE", "" + barcodes)
 
-                        barcodes.mapTo(barcodeModels) { BarcodeModel(it.displayValue ?: "") }
+                        barcodes
+                            .filter{ InvoiceChecker(it.displayValue ?: "").isValid }
+                            .mapTo(barcodeModels) {
+                                BarcodeModel(it.displayValue!!, InvoiceChecker(it.displayValue!!).isCollection)
+                            }
 
                         if (--countUris == 0) {
                             weakListener.get()?.onDetectorSuccess(barcodeModels)

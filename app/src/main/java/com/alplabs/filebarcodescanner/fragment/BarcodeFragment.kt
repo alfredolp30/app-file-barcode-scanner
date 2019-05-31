@@ -32,7 +32,7 @@ class BarcodeFragment : BaseFragment(), BarcodeAdapter.Listener {
 
         arguments?.let {
            it.getParcelableArray(BARCODE)?.filter { item -> item is BarcodeModel }?.forEach { item ->
-               adapter.barcodesModel.add(item as BarcodeModel)
+               adapter.barcodeModels.add(item as BarcodeModel)
            }
         }
     }

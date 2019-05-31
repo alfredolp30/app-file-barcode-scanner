@@ -12,7 +12,10 @@ import com.shockwave.pdfium.PdfiumCore
 import java.io.File
 import java.lang.ref.WeakReference
 import android.provider.OpenableColumns
-
+import java.math.BigInteger
+import java.security.MessageDigest
+import android.provider.MediaStore
+import com.alplabs.filebarcodescanner.extension.md5
 
 
 /**
@@ -37,9 +40,11 @@ class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<Uri, Uni
 
         if (uri != null && ctx != null) {
 
-            val fileId = getFileId(uri)
+            val fileName = getFileName(uri, ctx)
             val fd = ctx.contentResolver.openFileDescriptor(uri, "r")
             val core = PdfiumCore(ctx)
+
+            CALog.i("FILENAME", fileName)
 
             try {
                 val pdfDocument = core.newDocument(fd)
@@ -50,11 +55,11 @@ class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<Uri, Uni
 
                 for (page in 0 until pageCount) {
 
-                    val file = File(ctx.cacheDir, "$fileId-$page.png")
+                    val file = File(ctx.cacheDir, "${fileName.md5()}-$page.png")
 
                     if (file.exists()) {
                         outputUris.add(Uri.fromFile(file))
-                        CALog.i("PDF2Bitmap", "file exits with id $fileId and page $page")
+                        CALog.i("PDF2Bitmap", "file exits with name $fileName and page $page")
                         continue
                     }
 
@@ -104,7 +109,28 @@ class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<Uri, Uni
 
     }
 
+    private fun getFileName(uri: Uri, context: Context): String {
+        var fileName = ""
+        val scheme = uri.scheme
 
-    private fun getFileId(uri: Uri): String = DocumentsContract.getDocumentId(uri)
 
+        if (scheme == "file") {
+            fileName = uri.lastPathSegment ?: ""
+
+        } else if (scheme == "content") {
+            val cursor = context.contentResolver.query(uri, null, null, null, null)
+
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    fileName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                }
+            } catch (e: Exception) {
+                CALog.e("PDF2Bitmap", "cursor error", e)
+            }
+
+            cursor?.close()
+        }
+
+        return fileName
+    }
 }

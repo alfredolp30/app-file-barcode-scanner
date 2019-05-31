@@ -8,4 +8,7 @@
     <string name="not_found_barcode">Não foi encontrado nenhum código de barras.</string>
     <string name="initial">Encontre código de barras de boletos.</string>
     <string name="barcode_copy_success">Copiado com sucesso.</string>
+
+    <string name="without_date">Sem data.</string>
+    <string name="value">R$ %1$s</string>
 </resources>

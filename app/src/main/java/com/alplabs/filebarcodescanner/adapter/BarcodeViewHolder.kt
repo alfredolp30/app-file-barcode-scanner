@@ -9,7 +9,4 @@ import kotlinx.android.synthetic.main.cell_barcode.view.*
  * Created by Alfredo L. Porfirio on 01/03/19.
  * Copyright Universo Online 2019. All rights reserved.
  */
-class BarcodeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    val txtRawBarcode = view.txtRawBarcode
-    val imgBtnCopy = view.imgBtnCopy
-}
+class BarcodeViewHolder(view: View) : RecyclerView.ViewHolder(view)
