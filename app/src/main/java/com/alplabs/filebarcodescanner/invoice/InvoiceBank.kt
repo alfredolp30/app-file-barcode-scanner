@@ -54,9 +54,7 @@ class InvoiceBank(private val barcode: String) : InvoiceBase() {
 
     private fun digit10(block: String, isStartOne: Boolean = true) : Int {
 
-        val multiplier = mutableListOf(2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2)
-
-        if (isStartOne) multiplier.removeAt(0)
+        val multiplier = createWeights(if (isStartOne) listOf(1, 2)  else listOf(2, 1), block.length)
 
         var sum = 0
 

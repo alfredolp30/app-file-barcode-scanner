@@ -9,7 +9,7 @@ import com.alplabs.filebarcodescanner.extension.digitToInt
 abstract class InvoiceBase : InvoiceInterface {
 
 
-    private fun createWeights(weights: List<Int>, sizeOutput: Int) : List<Int> {
+    protected fun createWeights(weights: List<Int>, sizeOutput: Int) : List<Int> {
 
         val output = mutableListOf<Int>()
         val sizeWeights = weights.size
