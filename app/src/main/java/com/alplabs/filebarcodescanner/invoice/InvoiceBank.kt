@@ -85,4 +85,30 @@ class InvoiceBank(private val barcode: String) : InvoiceBase() {
 
         return digit
     }
+
+    override fun digit11(block: String): Int {
+
+        val multiplier = createWeights(listOf(2, 3, 4, 5, 6, 7, 8, 9), block.length)
+
+        var sum = 0
+
+        block.reversed().forEachIndexed { index, c ->
+
+            c.digitToInt()?.let { n ->
+
+                sum += n * multiplier[index]
+
+            }
+
+        }
+
+
+        val digit = 11 - (sum % 11)
+
+        return when (digit) {
+            0, 10, 11 -> 1
+
+            else -> digit
+        }
+    }
 }

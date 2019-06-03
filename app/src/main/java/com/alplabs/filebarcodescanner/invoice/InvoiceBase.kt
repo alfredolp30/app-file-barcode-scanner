@@ -23,32 +23,6 @@ abstract class InvoiceBase : InvoiceInterface {
         return output
     }
 
-    protected fun digit11(block: String) : Int {
-
-        val multiplier = createWeights(listOf(2, 3, 4, 5, 6, 7, 8, 9), block.length)
-
-        var sum = 0
-
-        block.reversed().forEachIndexed { index, c ->
-
-            c.digitToInt()?.let { n ->
-
-                sum += n * multiplier[index]
-
-            }
-
-        }
-
-        val digit = when (val rest = sum % 11) {
-            0, 1 -> 0
-
-            10 -> 1
-
-            else -> 11 - rest
-        }
-
-        return digit
-    }
-
+    abstract fun digit11(block: String) : Int
 
 }
