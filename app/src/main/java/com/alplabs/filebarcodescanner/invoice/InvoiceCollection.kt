@@ -1,6 +1,7 @@
 package com.alplabs.filebarcodescanner.invoice
 
 import com.alplabs.filebarcodescanner.extension.addSubstring
+import com.alplabs.filebarcodescanner.extension.digitToInt
 import java.util.*
 import kotlin.math.abs
 
@@ -8,7 +9,7 @@ import kotlin.math.abs
  * Created by Alfredo L. Porfirio on 2019-05-31.
  * Copyright Universo Online 2019. All rights reserved.
  */
-class InvoiceCollection(private val barcode: String) : InvoiceInterface {
+class InvoiceCollection(private val barcode: String) : InvoiceBase() {
 
     private val mapSegmentation = mapOf(
 
@@ -70,5 +71,22 @@ class InvoiceCollection(private val barcode: String) : InvoiceInterface {
         }
 
         return null
+    }
+
+
+    override val barcodeWithDigits: String get() {
+
+        val block1 = barcode.substring(0, 11)
+        val block2 = barcode.substring(11, 22)
+        val block3 = barcode.substring(22, 33)
+        val block4 = barcode.substring(33)
+
+
+        val digit1 = digit11(block1)
+        val digit2 = digit11(block2)
+        val digit3 = digit11(block3)
+        val digit4 = digit11(block4)
+
+        return block1 + digit1 + block2 + digit2 + block3 + digit3 + block4 + digit4
     }
 }

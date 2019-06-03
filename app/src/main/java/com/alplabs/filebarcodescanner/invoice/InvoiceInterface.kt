@@ -9,4 +9,5 @@ import java.util.*
 interface InvoiceInterface {
     val value: Double
     val date: GregorianCalendar?
+    val barcodeWithDigits: String
 }

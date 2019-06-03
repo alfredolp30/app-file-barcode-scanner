@@ -11,4 +11,7 @@
 
     <string name="without_date">Sem data.</string>
     <string name="value">R$ %1$s</string>
+    <string name="copy">Copiar</string>
+    <string name="pay">Vencimento em</string>
+    <string name="doc_value">Valor do documento</string>
 </resources>

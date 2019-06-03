@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.alplabs.filebarcodescanner.R
 import com.alplabs.filebarcodescanner.extension.setTextWithValue
+import com.alplabs.filebarcodescanner.invoice.InvoiceCollection
 import com.alplabs.filebarcodescanner.model.BarcodeModel
 import kotlinx.android.synthetic.main.cell_barcode.view.*
 import java.lang.ref.WeakReference
@@ -39,7 +40,7 @@ class BarcodeAdapter(val barcodeModels: MutableList<BarcodeModel>, listener: Lis
 
         val barcodeModel = barcodeModels[position]
 
-        val barcode = barcodeModel.barcode
+        val barcode = barcodeModel.invoice.barcodeWithDigits
         val date = barcodeModel.invoice.date
         val value = barcodeModel.invoice.value
 
@@ -52,10 +53,9 @@ class BarcodeAdapter(val barcodeModels: MutableList<BarcodeModel>, listener: Lis
         }
 
 
-
         holder.itemView.txtValue.text = holder.itemView.context.getString(R.string.value, df.format(value))
 
-        holder.itemView.imgBtnCopy.setOnClickListener {
+        holder.itemView.btnCopy.setOnClickListener {
             weakListener.get()?.onCopy(rawValue = barcode)
         }
     }
