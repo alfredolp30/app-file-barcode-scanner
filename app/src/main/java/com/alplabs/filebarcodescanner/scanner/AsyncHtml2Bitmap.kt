@@ -16,7 +16,7 @@ import java.lang.ref.WeakReference
 class AsyncHtml2Bitmap(context: Context, listener: Listener) : AsyncTask<Uri, Unit, Uri>() {
 
     interface Listener {
-        fun onFinishHtml2Bitmap(uri: Uri)
+        fun onFinishHtml2Bitmap(uri: Uri?)
     }
 
     private val weakContext = WeakReference(context)
@@ -50,8 +50,6 @@ class AsyncHtml2Bitmap(context: Context, listener: Listener) : AsyncTask<Uri, Un
     override fun onPostExecute(result: Uri?) {
         super.onPostExecute(result)
 
-        if (result != null) {
-            weakListener.get()?.onFinishHtml2Bitmap(result)
-        }
+        weakListener.get()?.onFinishHtml2Bitmap(result)
     }
 }

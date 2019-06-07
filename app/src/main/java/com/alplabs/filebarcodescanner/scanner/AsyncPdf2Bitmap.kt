@@ -29,10 +29,11 @@ class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<Uri, Uni
     }
 
     private val weakContext = WeakReference(context)
-
     private val weakListener = WeakReference(listener)
 
     override fun doInBackground(vararg params: Uri?): List<Uri> {
+        CALog.d("AsyncPdf2Bitmap", "init")
+
         val uri = params[0]
 
         val ctx = weakContext.get()
@@ -103,10 +104,7 @@ class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<Uri, Uni
     override fun onPostExecute(result: List<Uri>?) {
         super.onPostExecute(result)
 
-        if (result != null) {
-            weakListener.get()?.onFinishPdf2Bitmap(result)
-        }
-
+        weakListener.get()?.onFinishPdf2Bitmap(result ?: listOf())
     }
 
     private fun getFileName(uri: Uri, context: Context): String {

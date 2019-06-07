@@ -48,42 +48,7 @@ class InvoiceBank(private val barcode: String) : InvoiceBase() {
         val block4 = barcode.substring(0, 4) + barcode.substring(5)
         val block5 = barcode.substring(5, 9) + barcode.substring(9, 19)
 
-        return block1 + digit10(block1, false) + block2  + digit10(block2) + block3 + digit10(block3) + digit11(block4) + block5
-    }
-
-
-    private fun digit10(block: String, isStartOne: Boolean = true) : Int {
-
-        val multiplier = createWeights(if (isStartOne) listOf(1, 2)  else listOf(2, 1), block.length)
-
-        var sum = 0
-
-        block.forEachIndexed { index, c ->
-
-            c.digitToInt()?.let { n ->
-
-                var multi = (n * multiplier[index])
-
-                while (multi > 10) {
-                    var sumInternal = 0
-
-                    multi.toString().forEach { nInternal ->
-                        sumInternal += nInternal.digitToInt()!!
-                    }
-
-                    multi = sumInternal
-                }
-
-                sum += multi
-
-            }
-        }
-
-        val digit = (10 - (sum % 10)) % 10
-
-
-
-        return digit
+        return block1 + digit10(block1) + block2  + digit10(block2) + block3 + digit10(block3) + digit11(block4) + block5
     }
 
     override fun digit11(block: String): Int {

@@ -27,8 +27,8 @@ class BarcodeFragment : BaseFragment(), BarcodeAdapter.Listener {
 
     private val adapter = BarcodeAdapter(mutableListOf(), this)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
 
         arguments?.let {
            it.getParcelableArray(BARCODE)?.filter { item -> item is BarcodeModel }?.forEach { item ->

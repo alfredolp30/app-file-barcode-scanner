@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.os.Parcelable
 import android.util.Log
 import android.widget.Toast
@@ -119,7 +120,7 @@ open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
             .beginTransaction()
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .replace(R.id.frame, InitialFragment())
-            .commit()
+            .commitNowAllowingStateLoss()
 
     }
 
@@ -130,7 +131,7 @@ open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
             .beginTransaction()
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .replace(R.id.frame, ProgressFragment.newInstance(uri))
-            .commit()
+            .commitNowAllowingStateLoss()
 
     }
 
@@ -141,7 +142,7 @@ open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
             .beginTransaction()
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .replace(R.id.frame, BarcodeFragment.newInstance(barcodeModels))
-            .commit()
+            .commitNowAllowingStateLoss()
 
     }
 

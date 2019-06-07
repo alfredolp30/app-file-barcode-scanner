@@ -10,4 +10,7 @@ interface InvoiceInterface {
     val value: Double
     val date: GregorianCalendar?
     val barcodeWithDigits: String
+
+    fun digit11(block: String) : Int
+    fun digit10(block: String) : Int
 }

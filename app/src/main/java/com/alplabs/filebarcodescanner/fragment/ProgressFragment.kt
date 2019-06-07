@@ -3,31 +3,28 @@ package com.alplabs.filebarcodescanner.fragment
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.MimeTypeMap
-import com.alplabs.filebarcodescanner.BarcodeActivity
 import com.alplabs.filebarcodescanner.scanner.AsyncHtml2Bitmap
 import com.alplabs.filebarcodescanner.scanner.AsyncPdf2Bitmap
 import com.alplabs.filebarcodescanner.R
 import com.alplabs.filebarcodescanner.metrics.CALog
 import com.alplabs.filebarcodescanner.model.BarcodeModel
-import com.alplabs.filebarcodescanner.scanner.FirebaseBarcodeDetector
+import com.alplabs.filebarcodescanner.scanner.DetectorService
 import java.lang.ref.WeakReference
 
 private const val FILE_URI = "file_uri"
 
 class ProgressFragment : BaseFragment(), AsyncHtml2Bitmap.Listener,
-    AsyncPdf2Bitmap.Listener, FirebaseBarcodeDetector.Listener {
+    AsyncPdf2Bitmap.Listener, DetectorService.Listener {
 
     private var listener: WeakReference<Listener>? = null
     private var uriFile: Uri? = null
 
 
-    private val detector = FirebaseBarcodeDetector(this)
+    private val detector = DetectorService(this)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,9 +34,7 @@ class ProgressFragment : BaseFragment(), AsyncHtml2Bitmap.Listener,
             uriFile = it.getParcelable(FILE_URI)
         }
 
-        if (uriFile != null) {
-            start()
-        }
+        start()
     }
 
     override fun onCreateView(
@@ -58,11 +53,6 @@ class ProgressFragment : BaseFragment(), AsyncHtml2Bitmap.Listener,
         } else {
             throw RuntimeException("$context must implement ProgressFragmentListener")
         }
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        listener = null
     }
 
 
@@ -111,7 +101,14 @@ class ProgressFragment : BaseFragment(), AsyncHtml2Bitmap.Listener,
 
 
     private fun pdf2Bitmap(pdfUri: Uri) {
-        AsyncPdf2Bitmap(requireContext(), this).execute(pdfUri)
+        val ctx = context
+
+        if (ctx != null) {
+            AsyncPdf2Bitmap(ctx, this).execute(pdfUri)
+        } else {
+            listener?.get()?.onBarcodeScannerError()
+        }
+
     }
 
     override fun onFinishPdf2Bitmap(uris: List<Uri>) {
@@ -120,31 +117,40 @@ class ProgressFragment : BaseFragment(), AsyncHtml2Bitmap.Listener,
 
 
     private fun html2Bitmap(htmlUri: Uri) {
-        AsyncHtml2Bitmap(requireContext(), this).execute(htmlUri)
+        val ctx = context
+
+        if (ctx != null) {
+            AsyncHtml2Bitmap(ctx, this).execute(htmlUri)
+        } else {
+            listener?.get()?.onBarcodeScannerError()
+        }
+
     }
 
-    override fun onFinishHtml2Bitmap(uri: Uri) {
-        scannerBarcode(listOf(uri))
+    override fun onFinishHtml2Bitmap(uri: Uri?) {
+
+        if (uri != null) {
+            scannerBarcode(listOf(uri))
+        } else {
+            listener?.get()?.onBarcodeScannerError()
+        }
     }
 
 
     private fun scannerBarcode(uris: List<Uri>) {
-        if (uris.isEmpty()) {
+        val ctx = context
 
-            listener?.get()?.onBarcodeScannerError()
+        if (uris.isNotEmpty() && ctx != null) {
+
+            detector.start(ctx, uris)
 
         } else {
 
-            detector.scanner(requireContext(), uris)
-
+            listener?.get()?.onBarcodeScannerError()
         }
     }
 
-    override fun onDetectorSuccess(barcodeModels: List<BarcodeModel>) {
+    override fun onFinishDetectorService(barcodeModels: List<BarcodeModel>) {
         listener?.get()?.onBarcodeScannerSuccess(barcodeModels)
-    }
-
-    override fun onDetectorFailure() {
-        listener?.get()?.onBarcodeScannerError()
     }
 }

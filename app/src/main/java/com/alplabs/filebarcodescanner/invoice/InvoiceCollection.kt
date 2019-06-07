@@ -27,6 +27,8 @@ class InvoiceCollection(private val barcode: String) : InvoiceBase() {
 
     val segmentation : String? = mapSegmentation[barcode[1]]
 
+    private val effectiveValue: String by lazy { barcode.substring(2, 3) }
+
     override val value: Double get() {
         var str = barcode.substring(4, 15)
         str = str.trimStart { it == '0' }
@@ -82,10 +84,10 @@ class InvoiceCollection(private val barcode: String) : InvoiceBase() {
         val block4 = barcode.substring(33)
 
 
-        val digit1 = digit11(block1)
-        val digit2 = digit11(block2)
-        val digit3 = digit11(block3)
-        val digit4 = digit11(block4)
+        val digit1 = digit(block1)
+        val digit2 = digit(block2)
+        val digit3 = digit(block3)
+        val digit4 = digit(block4)
 
         return block1 + digit1 + block2 + digit2 + block3 + digit3 + block4 + digit4
     }
@@ -116,5 +118,18 @@ class InvoiceCollection(private val barcode: String) : InvoiceBase() {
         }
 
         return digit
+    }
+
+    private fun digit(block: String): Int {
+
+        return when (effectiveValue) {
+            "6", "7" -> {
+                digit10(block)
+            }
+
+            else -> {
+                digit11(block)
+            }
+        }
     }
 }
