@@ -16,6 +16,7 @@ import com.alplabs.filebarcodescanner.metrics.CALog
 import com.alplabs.filebarcodescanner.model.BarcodeModel
 
 import kotlinx.android.synthetic.main.activity_barcode.*
+import kotlinx.android.synthetic.main.content_barcode.*
 
 open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
 
@@ -24,6 +25,7 @@ open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
         val FILE_REQUEST_CODE = nextRequestCode()
 
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
