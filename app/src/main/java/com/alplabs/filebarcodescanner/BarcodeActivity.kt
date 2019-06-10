@@ -122,7 +122,7 @@ open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
             .beginTransaction()
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .replace(R.id.frame, InitialFragment())
-            .commitNowAllowingStateLoss()
+            .commitAllowingStateLoss()
 
     }
 
@@ -133,7 +133,7 @@ open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
             .beginTransaction()
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .replace(R.id.frame, ProgressFragment.newInstance(uri))
-            .commitNowAllowingStateLoss()
+            .commitAllowingStateLoss()
 
     }
 
@@ -144,7 +144,7 @@ open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
             .beginTransaction()
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .replace(R.id.frame, BarcodeFragment.newInstance(barcodeModels))
-            .commitNowAllowingStateLoss()
+            .commitAllowingStateLoss()
 
     }
 
