@@ -14,4 +14,8 @@
     <string name="copy">Copiar</string>
     <string name="pay">Vencimento em</string>
     <string name="doc_value">Valor do documento</string>
+    <string name="required_password">Digite a senha do arquivo %1$s</string>
+    <string name="cancel_digit_password">O arquivo requer senha</string>
+    <string name="cancel">Cancelar</string>
+    <string name="confirm">OK</string>
 </resources>

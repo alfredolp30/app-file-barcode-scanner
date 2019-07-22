@@ -9,11 +9,16 @@ import android.view.ViewGroup
 import android.webkit.MimeTypeMap
 import com.alplabs.filebarcodescanner.scanner.AsyncHtml2Bitmap
 import com.alplabs.filebarcodescanner.scanner.AsyncPdf2Bitmap
-import com.alplabs.filebarcodescanner.R
 import com.alplabs.filebarcodescanner.metrics.CALog
 import com.alplabs.filebarcodescanner.model.BarcodeModel
 import com.alplabs.filebarcodescanner.scanner.DetectorService
 import java.lang.ref.WeakReference
+import android.text.InputType
+import android.widget.EditText
+import android.app.AlertDialog
+import android.text.Layout
+import com.alplabs.filebarcodescanner.R
+
 
 private const val FILE_URI = "file_uri"
 
@@ -55,10 +60,9 @@ class ProgressFragment : BaseFragment(), AsyncHtml2Bitmap.Listener,
         }
     }
 
-
     interface Listener {
         fun onBarcodeScannerSuccess(barcodeModels: List<BarcodeModel>)
-        fun onBarcodeScannerError()
+        fun onBarcodeScannerError(error: Error? = null)
     }
 
     companion object {
@@ -100,11 +104,11 @@ class ProgressFragment : BaseFragment(), AsyncHtml2Bitmap.Listener,
     }
 
 
-    private fun pdf2Bitmap(pdfUri: Uri) {
+    private fun pdf2Bitmap(pdfUri: Uri, password: String? = null) {
         val ctx = context
 
         if (ctx != null) {
-            AsyncPdf2Bitmap(ctx, this).execute(pdfUri)
+            AsyncPdf2Bitmap(ctx, this).execute(AsyncPdf2Bitmap.WorkPdf(uri = pdfUri, password = password))
         } else {
             listener?.get()?.onBarcodeScannerError()
         }
@@ -113,6 +117,31 @@ class ProgressFragment : BaseFragment(), AsyncHtml2Bitmap.Listener,
 
     override fun onFinishPdf2Bitmap(uris: List<Uri>) {
         scannerBarcode(uris)
+    }
+
+    override fun onRequiredPassword(fileName: String) {
+        val alert = AlertDialog.Builder(context)
+        alert.setTitle(getString(R.string.required_password, fileName))
+
+        val view = LayoutInflater.from(context).inflate(R.layout.alert_password, null, false)
+
+        val edtTextPass = view.findViewById<EditText>(R.id.edtTextPass)
+
+        alert.setView(view)
+
+        alert.setPositiveButton(R.string.confirm) { _, _ ->
+            edtTextPass.clearComposingText()
+
+            val password = edtTextPass.text.toString().trim()
+
+            pdf2Bitmap(this.uriFile!!, password)
+        }
+
+        alert.setNegativeButton(getString(R.string.cancel)) { _, _ ->
+            listener?.get()?.onBarcodeScannerError(Error(getString(R.string.cancel_digit_password)))
+        }
+
+        if (activity?.isFinishing == false && activity?.isDestroyed == false) alert.show()
     }
 
 

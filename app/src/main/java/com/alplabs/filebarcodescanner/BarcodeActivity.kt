@@ -149,9 +149,15 @@ open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
     }
 
 
-    override fun onBarcodeScannerError() {
+    override fun onBarcodeScannerError(error: Error?) {
 
-        showToast(getString(R.string.unknown_error), Toast.LENGTH_LONG)
+        val errorMsg: String = if (error != null) {
+            error.localizedMessage
+        } else {
+            getString(R.string.unknown_error)
+        }
+
+        showToast(errorMsg, Toast.LENGTH_LONG)
 
         showInitialFragment()
 

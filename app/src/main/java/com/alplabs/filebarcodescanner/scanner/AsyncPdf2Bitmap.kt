@@ -16,39 +16,57 @@ import java.math.BigInteger
 import java.security.MessageDigest
 import android.provider.MediaStore
 import com.alplabs.filebarcodescanner.extension.md5
+import com.shockwave.pdfium.PdfDocument
+import com.shockwave.pdfium.PdfPasswordException
 
 
 /**
  * Created by Alfredo L. Porfirio on 26/02/19.
  * Copyright Universo Online 2019. All rights reserved.
  */
-class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<Uri, Unit, List<Uri>>() {
+class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<AsyncPdf2Bitmap.WorkPdf, Unit, AsyncPdf2Bitmap.DataResult>() {
 
     interface Listener {
         fun onFinishPdf2Bitmap(uris: List<Uri>)
+        fun onRequiredPassword(fileName: String)
     }
 
     private val weakContext = WeakReference(context)
     private val weakListener = WeakReference(listener)
 
-    override fun doInBackground(vararg params: Uri?): List<Uri> {
+    data class WorkPdf(
+        val uri: Uri,
+        val password: String?
+    )
+
+
+    data class DataResult(
+        var fileName: String,
+        val uris: MutableList<Uri>,
+        var requiredPassword: Boolean
+    )
+
+    override fun doInBackground(vararg params: WorkPdf?): DataResult {
         CALog.d("AsyncPdf2Bitmap", "init")
 
-        val uri = params[0]
+        val workPdf = params[0] as WorkPdf
 
-        val ctx = weakContext.get()
-        val outputUris = mutableListOf<Uri>()
+        val dataResult = DataResult("", mutableListOf(), false)
 
-        if (uri != null && ctx != null) {
-
-            val fileName = getFileName(uri, ctx)
-            val fd = ctx.contentResolver.openFileDescriptor(uri, "r")
-            val core = PdfiumCore(ctx)
-
-            CALog.i("FILENAME", fileName)
+        weakContext.get()?.let { ctx ->
 
             try {
-                val pdfDocument = core.newDocument(fd)
+
+                val fd = ctx.contentResolver.openFileDescriptor(workPdf.uri, "r")
+                val fileName = getFileName(workPdf.uri, ctx)
+
+                CALog.i("FILENAME", fileName)
+
+                dataResult.fileName = fileName
+
+                val core = PdfiumCore(ctx)
+
+                val pdfDocument = core.newDocument(fd, workPdf.password)
 
                 val pageCount = core.getPageCount(pdfDocument)
 
@@ -59,7 +77,7 @@ class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<Uri, Uni
                     val file = File(ctx.cacheDir, "${fileName.md5()}-$page.png")
 
                     if (file.exists()) {
-                        outputUris.add(Uri.fromFile(file))
+                        dataResult.uris.add(Uri.fromFile(file))
                         CALog.i("PDF2Bitmap", "file exits with name $fileName and page $page")
                         continue
                     }
@@ -87,24 +105,33 @@ class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<Uri, Uni
 
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, file.outputStream())
 
-                    outputUris.add(Uri.fromFile(file))
+                    dataResult.uris.add(Uri.fromFile(file))
                 }
 
                 core.closeDocument(pdfDocument)
 
-            } catch (e: Exception) {
-                CALog.e("PDF2Bitmap", "error convert", e)
+            } catch (ex: PdfPasswordException) {
+
+                dataResult.requiredPassword = true
+
+            } catch (th: Throwable) {
+
+                CALog.e("PDF2Bitmap", "error convert", th)
             }
         }
 
-        return outputUris
+        return dataResult
     }
 
 
-    override fun onPostExecute(result: List<Uri>?) {
+    override fun onPostExecute(result: DataResult?) {
         super.onPostExecute(result)
 
-        weakListener.get()?.onFinishPdf2Bitmap(result ?: listOf())
+        if (result?.requiredPassword == true) {
+            weakListener.get()?.onRequiredPassword(result.fileName)
+        } else {
+            weakListener.get()?.onFinishPdf2Bitmap(result?.uris ?: listOf())
+        }
     }
 
     private fun getFileName(uri: Uri, context: Context): String {
