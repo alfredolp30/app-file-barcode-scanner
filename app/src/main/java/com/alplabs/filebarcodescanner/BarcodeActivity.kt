@@ -4,9 +4,11 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
 import android.os.Parcelable
-import android.util.Log
+import android.view.ContextMenu
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.FragmentTransaction
 import com.alplabs.filebarcodescanner.fragment.BarcodeFragment
@@ -16,13 +18,13 @@ import com.alplabs.filebarcodescanner.metrics.CALog
 import com.alplabs.filebarcodescanner.model.BarcodeModel
 
 import kotlinx.android.synthetic.main.activity_barcode.*
-import kotlinx.android.synthetic.main.content_barcode.*
 
 open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
 
     companion object {
 
-        val FILE_REQUEST_CODE = nextRequestCode()
+        val REQUEST_CODE_FILE = nextRequestCode()
+        val RESULT_CODE_CAMERA_ACTIVITY = nextRequestCode()
 
     }
 
@@ -60,25 +62,55 @@ open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
 
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.barcode, menu)
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+
+        if (item?.itemId == R.id.action_camera) {
+
+            cameraCapture()
+
+            return true
+        }
+
+
+        return super.onContextItemSelected(item)
+    }
+
 
     private fun pickerFile() {
 
-        val i = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+       Intent(Intent.ACTION_OPEN_DOCUMENT).also {
 
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "*/*"
-            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/jpg", "image/png", "image/jpeg", "image/bmp", "application/pdf", "text/html"))
+            it.addCategory(Intent.CATEGORY_OPENABLE)
+            it.type = "*/*"
+            it.putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/jpg", "image/png", "image/jpeg", "image/bmp", "application/pdf", "text/html"))
 
+
+            startActivityForResult(it, REQUEST_CODE_FILE)
         }
 
-        startActivityForResult(i, FILE_REQUEST_CODE)
+
+    }
+
+
+    private fun cameraCapture() {
+
+        Intent(this, CameraActivity::class.java).also {
+            startActivityForResult(it, RESULT_CODE_CAMERA_ACTIVITY)
+        }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         when (requestCode) {
-            FILE_REQUEST_CODE -> {
+            REQUEST_CODE_FILE -> {
                 if (resultCode == Activity.RESULT_OK) {
 
                     data?.data?.also { uri ->
@@ -87,6 +119,19 @@ open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
 
                 } else {
                     CALog.i("PICKER_FILE", "cancelled")
+                }
+            }
+
+            RESULT_CODE_CAMERA_ACTIVITY -> {
+                if (resultCode == Activity.RESULT_OK) {
+
+                    val barcodeModels =
+                        data?.extras?.getParcelableArrayList<BarcodeModel>(CameraActivity.BARCODE) ?: arrayListOf()
+
+                    showBarcodeFragment(barcodeModels)
+
+                } else {
+                    CALog.i("CAMERA_ACTIVITY", "cancelled")
                 }
             }
 

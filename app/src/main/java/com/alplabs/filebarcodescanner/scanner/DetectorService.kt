@@ -13,7 +13,7 @@ class DetectorService(listener: Listener) {
 
     val weakReference = WeakReference(listener)
     val totalBarcodeModels = mutableListOf<BarcodeModel>()
-    val listeners = mutableListOf<AsyncFirebaseBarcodeDetector.Listener>()
+    val listeners = mutableListOf<AsyncFirebaseBarcodeUriDetector.Listener>()
 
     interface Listener {
         fun onFinishDetectorService(barcodeModels: List<BarcodeModel>)
@@ -25,7 +25,7 @@ class DetectorService(listener: Listener) {
 
         uris.forEach { uri ->
 
-            val listener = object : AsyncFirebaseBarcodeDetector.Listener {
+            val listener = object : AsyncFirebaseBarcodeUriDetector.Listener {
 
                 override fun onDetectorFinish(barcodeModels: List<BarcodeModel>) {
                     totalBarcodeModels.addAll(barcodeModels)
@@ -38,7 +38,7 @@ class DetectorService(listener: Listener) {
 
             }
 
-            AsyncFirebaseBarcodeDetector(context, listener).execute(uri)
+            AsyncFirebaseBarcodeUriDetector(context, listener).execute(uri)
 
             listeners.add(listener)
         }

@@ -80,7 +80,7 @@
                     android:layout_gravity="top"
                     android:foreground="?attr/selectableItemBackground"
                     android:id="@+id/btnCopy" android:layout_height="32dp"
-                    android:drawableStart="@drawable/ic_content_copy" android:textColor="@android:color/white"
+                    android:drawableStart="@drawable/ic_copy" android:textColor="@android:color/white"
             />
         </LinearLayout>
 

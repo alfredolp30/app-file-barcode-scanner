@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Facilitador de Boletos</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
+    <string name="title_camera">Camera</string>
 
     <string name="unknown_error">Erro desconhecido.</string>
     <string name="processing_file">Analisando documento.</string>
