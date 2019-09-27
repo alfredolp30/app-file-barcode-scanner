@@ -7,15 +7,21 @@
                                                    android:layout_height="match_parent" android:layout_gravity="center">
 
     <ImageView
-            android:layout_gravity="center"
+            android:id="@+id/imgBarcode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/imgBarcode"
-            app:srcCompat="@drawable/ic_barcode" android:layout_margin="16dp"
-            app:layout_constraintTop_toTopOf="parent" android:layout_marginEnd="8dp"
-            app:layout_constraintEnd_toEndOf="parent" android:layout_marginStart="8dp"
-            app:layout_constraintStart_toStartOf="@+id/txtBarcode" android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginTop="8dp"/>
+            android:layout_gravity="center"
+            android:layout_margin="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/txtBarcode"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.38"
+            app:srcCompat="@drawable/ic_barcode" />
     <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content" android:id="@+id/txtBarcode" android:maxLines="3"
@@ -23,5 +29,36 @@
             app:layout_constraintTop_toBottomOf="@+id/imgBarcode" android:layout_marginStart="8dp"
             app:layout_constraintStart_toStartOf="parent" android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent" android:layout_marginTop="16dp" android:textSize="18sp"/>
+
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtBarcode">
+
+        <Button
+                android:id="@+id/btnArchive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:background="@drawable/layer_button_background"
+                android:text="@string/title_archive"
+                android:foreground="?attr/selectableItemBackground"
+                android:textColor="@android:color/white" />
+
+        <Button
+                android:id="@+id/btnCamera"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/layer_button_background"
+                android:text="@string/title_camera"
+                android:foreground="?attr/selectableItemBackground"
+                android:textColor="@android:color/white" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

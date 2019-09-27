@@ -1,11 +1,12 @@
 <resources>
     <string name="app_name">Facilitador de Boletos</string>
-    <string name="title_camera">Camera</string>
+    <string name="title_camera">Câmera</string>
+    <string name="title_archive">Arquivo</string>
 
     <string name="unknown_error">Erro desconhecido.</string>
-    <string name="processing_file">Analisando documento.</string>
+    <string name="processing_file">Analisando arquivo.</string>
     <string name="not_found_barcode">Não foi encontrado nenhum código de barras.</string>
-    <string name="initial">Encontre código de barras de boletos.</string>
+    <string name="initial">Selecione um arquivo ou a câmera para encontrar o código de barras.</string>
     <string name="barcode_copy_success">Copiado com sucesso.</string>
 
     <string name="without_date">Sem data.</string>

@@ -18,8 +18,9 @@ import com.alplabs.filebarcodescanner.metrics.CALog
 import com.alplabs.filebarcodescanner.model.BarcodeModel
 
 import kotlinx.android.synthetic.main.activity_barcode.*
+import kotlinx.android.synthetic.main.cell_initial.*
 
-open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
+open class BarcodeActivity : BaseActivity(), InitialFragment.Listener, ProgressFragment.Listener {
 
     companion object {
 
@@ -35,14 +36,6 @@ open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
         setSupportActionBar(toolbar)
 
         showInitialFragment()
-
-        fab.setOnClickListener {
-
-            appBarcode?.analytics?.eventSelectContent("new_file")
-
-            pickerFile()
-        }
-
 
         when (intent?.action) {
             Intent.ACTION_VIEW -> {
@@ -62,23 +55,17 @@ open class BarcodeActivity : BaseActivity(), ProgressFragment.Listener {
 
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.barcode, menu)
 
-        return true
+    override fun onSelectArchive() {
+        appBarcode?.analytics?.eventSelectContent("select_archive")
+
+        pickerFile()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+    override fun onSelectCamera() {
+        appBarcode?.analytics?.eventSelectContent("select_camera")
 
-        if (item?.itemId == R.id.action_camera) {
-
-            cameraCapture()
-
-            return true
-        }
-
-
-        return super.onContextItemSelected(item)
+        cameraCapture()
     }
 
 
