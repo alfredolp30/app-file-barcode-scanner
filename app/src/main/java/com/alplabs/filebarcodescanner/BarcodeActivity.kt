@@ -55,6 +55,11 @@ open class BarcodeActivity : BaseActivity(), InitialFragment.Listener, ProgressF
 
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        showInitialFragment()
+        return true
+    }
+
 
     override fun onSelectArchive() {
         appBarcode?.analytics?.eventSelectContent("select_archive")
@@ -149,6 +154,7 @@ open class BarcodeActivity : BaseActivity(), InitialFragment.Listener, ProgressF
     }
 
    private fun showInitialFragment() {
+       supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
         supportFragmentManager
             .beginTransaction()
@@ -171,6 +177,7 @@ open class BarcodeActivity : BaseActivity(), InitialFragment.Listener, ProgressF
 
 
     private fun showBarcodeFragment(barcodeModels: List<BarcodeModel>) {
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         supportFragmentManager
             .beginTransaction()
