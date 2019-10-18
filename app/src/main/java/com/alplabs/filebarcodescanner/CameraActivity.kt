@@ -295,17 +295,16 @@ class CameraActivity : BaseActivity(), AsyncFirebaseBarcodeBufferDetector.Listen
         }
     }
 
-    override fun onDetectorFinish(barcodeModels: List<BarcodeModel>) {
+    override fun onDetectorFinish(barcodeModel: BarcodeModel?) {
 
-        if (barcodeModels.isNotEmpty()) {
+        barcodeModel?.let { model ->
             CALog.i(CameraActivity::onDetectorFinish.name, "Found barcode with camera")
 
             Intent().also {
-                it.putParcelableArrayListExtra(BARCODE, ArrayList(barcodeModels))
+                it.putParcelableArrayListExtra(BARCODE, arrayListOf(model))
                 setResult(Activity.RESULT_OK, it)
                 finish()
             }
-
         }
 
     }

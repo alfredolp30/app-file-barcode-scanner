@@ -14,6 +14,7 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import java.lang.ref.WeakReference
 import java.nio.ByteBuffer
+import java.util.*
 
 /**
  * Created by Alfredo L. Porfirio on 01/03/19.
@@ -21,64 +22,74 @@ import java.nio.ByteBuffer
  */
 private class FirebaseBarcodeDetector {
 
-    companion object {
+    private val detector : FirebaseVisionBarcodeDetector by lazy {
 
-        private val detector : FirebaseVisionBarcodeDetector by lazy {
+        val options = FirebaseVisionBarcodeDetectorOptions.Builder()
+            .setBarcodeFormats(FirebaseVisionBarcode.FORMAT_ITF)
+            .build()
 
-            val options = FirebaseVisionBarcodeDetectorOptions.Builder()
-                .setBarcodeFormats(FirebaseVisionBarcode.FORMAT_ITF)
-                .build()
-
-            FirebaseVision.getInstance().getVisionBarcodeDetector(options)
-        }
+        FirebaseVision.getInstance().getVisionBarcodeDetector(options)
     }
 
-    fun scanner(context: Context, uri: Uri, callback: (List<BarcodeModel>) -> Unit) {
+//    private var listener: AsyncFirebaseTextDateUriDetector.Listener? = null
+//    private var task: AsyncFirebaseTextDateUriDetector? = null
+    private val detectorDate = FirebaseTextDateDetector()
 
-        val barcodeModels = mutableListOf<BarcodeModel>()
+    fun scanner(context: Context, uri: Uri, callback: (BarcodeModel?) -> Unit) {
 
         try {
 
             val image = FirebaseVisionImage.fromFilePath(context, uri)
 
             detector.detectInImage(image)
-                .addOnSuccessListener { barcodes ->
+                .addOnSuccessListener { firebaseBarcodes ->
 
-                    CALog.d("SCANNER_BARCODE", "" + barcodes)
+                    CALog.d("SCANNER_BARCODE", "" + firebaseBarcodes)
 
-                    barcodes
-                        .filter{ InvoiceChecker(it.displayValue ?: "").isValid }
-                        .mapTo(barcodeModels) {
-                            BarcodeModel(it.displayValue!!, InvoiceChecker(it.displayValue!!).isCollection)
+                    val barcode = firebaseBarcodes.first().rawValue!!
+
+                    val checker = InvoiceChecker(barcode)
+
+                    if (checker.isValid) {
+                        val isCollection = checker.isCollection
+
+                        if (checker.isCollection) {
+
+                            detectorDate.scanner(context, uri) { date ->
+                                callback.invoke(BarcodeModel(barcode, isCollection, date))
+                            }
+
+                        } else {
+                            callback.invoke(BarcodeModel(barcode, isCollection, null))
                         }
 
-                    callback.invoke(barcodeModels)
+                    } else {
+                        callback.invoke(null)
+                    }
 
                 }.addOnFailureListener { exception ->
 
                     CALog.e( "SCANNER_BARCODE", exception.message)
 
-                    callback.invoke(barcodeModels)
+                    callback.invoke(null)
                 }
 
-        } catch (e: Exception) {
+        } catch (th: Throwable) {
 
-            CALog.e("scannerBarcode", "Error", e)
+            CALog.e("scannerBarcode", "Error", th)
 
-            callback.invoke(barcodeModels)
+            callback.invoke(null)
         }
     }
 
 
-    fun scanner(buffer: ByteBuffer, width: Int, height: Int, callback: (List<BarcodeModel>) -> Unit) {
-
-        val barcodeModels = mutableListOf<BarcodeModel>()
+    fun scanner(buffer: ByteBuffer, width: Int, height: Int, callback: (BarcodeModel?) -> Unit) {
 
         try {
 
             val metadata = FirebaseVisionImageMetadata.Builder()
-                .setWidth(width) // 480x360 is typically sufficient for
-                .setHeight(height) // image recognition
+                .setWidth(width)
+                .setHeight(height)
                 .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_YV12)
                 .setRotation(FirebaseVisionImageMetadata.ROTATION_270)
                 .build()
@@ -86,30 +97,34 @@ private class FirebaseBarcodeDetector {
             val image = FirebaseVisionImage.fromByteBuffer(buffer, metadata)
 
             detector.detectInImage(image)
-                .addOnSuccessListener { barcodes ->
+                .addOnSuccessListener { firabaseBarcodes ->
 
-                    CALog.d("SCANNER_BARCODE", "" + barcodes)
+                    CALog.d("SCANNER_BARCODE", "" + firabaseBarcodes)
 
-                    barcodes
-                        .filter{ InvoiceChecker(it.displayValue ?: "").isValid }
-                        .mapTo(barcodeModels) {
-                            BarcodeModel(it.displayValue!!, InvoiceChecker(it.displayValue!!).isCollection)
-                        }
+                    val barcode = firabaseBarcodes.first().rawValue!!
 
-                    callback.invoke(barcodeModels)
+                    val checker = InvoiceChecker(barcode)
+
+                    if (checker.isValid) {
+                        val isCollection = checker.isCollection
+
+                        callback.invoke(BarcodeModel(barcode, isCollection, null))
+                    } else {
+                        callback.invoke(null)
+                    }
 
                 }.addOnFailureListener { exception ->
 
                     CALog.e( "SCANNER_BARCODE", exception.message)
 
-                    callback.invoke(barcodeModels)
+                    callback.invoke(null)
                 }
 
-        } catch (e: Exception) {
+        } catch (th: Throwable) {
 
-            CALog.e("scannerBarcode", "Error", e)
+            CALog.e("scannerBarcode", "Error", th)
 
-            callback.invoke(barcodeModels)
+            callback.invoke(null)
         }
     }
 }
@@ -130,8 +145,8 @@ class AsyncFirebaseBarcodeUriDetector(context: Context, listener: Listener)
 
 
         if (ctx != null && uri != null) {
-            detector.scanner(ctx, uri) { barcodeModels ->
-                weakListener.get()?.onDetectorFinish(barcodeModels)
+            detector.scanner(ctx, uri) { barcodeModel ->
+                weakListener.get()?.onDetectorFinish(barcodeModel)
             }
         }
 
@@ -140,7 +155,7 @@ class AsyncFirebaseBarcodeUriDetector(context: Context, listener: Listener)
     }
 
     interface Listener {
-        fun onDetectorFinish(barcodeModels: List<BarcodeModel>)
+        fun onDetectorFinish(barcodeModel: BarcodeModel?)
     }
 
 }
@@ -163,8 +178,8 @@ class AsyncFirebaseBarcodeBufferDetector(
 
 
         buffer?.let {
-            detector.scanner(it, width, height) { barcodeModels ->
-                weakListener.get()?.onDetectorFinish(barcodeModels)
+            detector.scanner(it, width, height) { barcodeModel ->
+                weakListener.get()?.onDetectorFinish(barcodeModel)
             }
         }
 
@@ -173,6 +188,6 @@ class AsyncFirebaseBarcodeBufferDetector(
     }
 
     interface Listener {
-        fun onDetectorFinish(barcodeModels: List<BarcodeModel>)
+        fun onDetectorFinish(barcodeModel: BarcodeModel?)
     }
 }

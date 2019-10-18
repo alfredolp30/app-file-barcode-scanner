@@ -27,12 +27,14 @@ class DetectorService(listener: Listener) {
 
             val listener = object : AsyncFirebaseBarcodeUriDetector.Listener {
 
-                override fun onDetectorFinish(barcodeModels: List<BarcodeModel>) {
-                    totalBarcodeModels.addAll(barcodeModels)
-                    listeners.remove(this)
+                override fun onDetectorFinish(barcodeModel: BarcodeModel?) {
+                    barcodeModel?.let { model ->
+                        totalBarcodeModels.add(model)
+                        listeners.remove(this)
 
-                    if (listeners.isEmpty()) {
-                        weakReference.get()?.onFinishDetectorService(totalBarcodeModels)
+                        if (listeners.isEmpty()) {
+                            weakReference.get()?.onFinishDetectorService(totalBarcodeModels)
+                        }
                     }
                 }
 
