@@ -41,7 +41,7 @@ class BarcodeFragment : BaseFragment(), BarcodeAdapter.Listener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
+
         val view = inflater.inflate(R.layout.fragment_barcodes, container, false)
 
         view.rcBarcode.layoutManager = LinearLayoutManager(requireContext())
@@ -51,7 +51,7 @@ class BarcodeFragment : BaseFragment(), BarcodeAdapter.Listener {
     }
 
     override fun onCopy(rawValue: String) {
-        clipboardManager?.primaryClip = ClipData.newPlainText("barcode", rawValue)
+        clipboardManager?.setPrimaryClip(ClipData.newPlainText("barcode", rawValue))
 
         baseActivity?.showToast(getString(R.string.barcode_copy_success))
     }

@@ -190,11 +190,7 @@ open class BarcodeActivity : BaseActivity(), InitialFragment.Listener, ProgressF
 
     override fun onBarcodeScannerError(error: Error?) {
 
-        val errorMsg: String = if (error != null) {
-            error.localizedMessage
-        } else {
-            getString(R.string.unknown_error)
-        }
+        val errorMsg: String = error?.localizedMessage ?: getString(R.string.unknown_error)
 
         showToast(errorMsg, Toast.LENGTH_LONG)
 

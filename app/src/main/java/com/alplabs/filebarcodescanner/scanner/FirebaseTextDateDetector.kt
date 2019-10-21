@@ -6,7 +6,9 @@ import android.os.AsyncTask
 import com.alplabs.filebarcodescanner.metrics.CALog
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import java.lang.Exception
 import java.lang.ref.WeakReference
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -51,13 +53,18 @@ class FirebaseTextDateDetector {
 
                         calendar.apply {
                             try {
-                                time = if (it.contains(" ")) {
+                                val date = if (it.contains(" ")) {
                                     largeDateFormat.parse(it)
                                 } else {
                                     dateFormat.parse(it)
                                 }
-                            } catch (th: Throwable) {
-                                CALog.e("FirebaseTextDateDetector::scanner", th.message, th)
+
+                                date?.let {
+                                    time = date
+                                }
+
+                            } catch (ex: ParseException) {
+                                CALog.e("FirebaseTextDateDetector::scanner", ex.message, ex)
                                 return@map null
                             }
                         }

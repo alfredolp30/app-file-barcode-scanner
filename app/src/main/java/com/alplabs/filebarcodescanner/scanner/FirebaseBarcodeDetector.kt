@@ -12,6 +12,7 @@ import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetector
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
+import java.io.IOException
 import java.lang.ref.WeakReference
 import java.nio.ByteBuffer
 import java.util.*
@@ -46,37 +47,41 @@ private class FirebaseBarcodeDetector {
 
                     CALog.d("SCANNER_BARCODE", "" + firebaseBarcodes)
 
-                    val barcode = firebaseBarcodes.first().rawValue!!
+                    val barcode = firebaseBarcodes.firstOrNull()?.rawValue
 
-                    val checker = InvoiceChecker(barcode)
+                    if (barcode != null) {
+                        val checker = InvoiceChecker(barcode)
 
-                    if (checker.isValid) {
-                        val isCollection = checker.isCollection
+                        if (checker.isValid) {
+                            val isCollection = checker.isCollection
 
-                        if (checker.isCollection) {
+                            if (checker.isCollection) {
 
-                            detectorDate.scanner(context, uri) { date ->
-                                callback.invoke(BarcodeModel(barcode, isCollection, date))
+                                detectorDate.scanner(context, uri) { date ->
+                                    callback.invoke(BarcodeModel(barcode, isCollection, date))
+                                }
+
+                            } else {
+                                callback.invoke(BarcodeModel(barcode, isCollection, null))
                             }
 
                         } else {
-                            callback.invoke(BarcodeModel(barcode, isCollection, null))
+                            callback.invoke(null)
                         }
-
                     } else {
                         callback.invoke(null)
                     }
 
-                }.addOnFailureListener { exception ->
+                }.addOnFailureListener { ex ->
 
-                    CALog.e( "SCANNER_BARCODE", exception.message)
+                    CALog.e( "SCANNER_BARCODE", ex.message, ex)
 
                     callback.invoke(null)
                 }
 
-        } catch (th: Throwable) {
+        } catch (ex: IOException) {
 
-            CALog.e("scannerBarcode", "Error", th)
+            CALog.e("scannerBarcode", ex.message, ex)
 
             callback.invoke(null)
         }
@@ -97,18 +102,22 @@ private class FirebaseBarcodeDetector {
             val image = FirebaseVisionImage.fromByteBuffer(buffer, metadata)
 
             detector.detectInImage(image)
-                .addOnSuccessListener { firabaseBarcodes ->
+                .addOnSuccessListener { firebaseBarcodes ->
 
-                    CALog.d("SCANNER_BARCODE", "" + firabaseBarcodes)
+                    CALog.d("SCANNER_BARCODE", "" + firebaseBarcodes)
 
-                    val barcode = firabaseBarcodes.first().rawValue!!
+                    val barcode = firebaseBarcodes.firstOrNull()?.rawValue
 
-                    val checker = InvoiceChecker(barcode)
+                    if (barcode != null) {
+                        val checker = InvoiceChecker(barcode)
 
-                    if (checker.isValid) {
-                        val isCollection = checker.isCollection
+                        if (checker.isValid) {
+                            val isCollection = checker.isCollection
 
-                        callback.invoke(BarcodeModel(barcode, isCollection, null))
+                            callback.invoke(BarcodeModel(barcode, isCollection, null))
+                        } else {
+                            callback.invoke(null)
+                        }
                     } else {
                         callback.invoke(null)
                     }
@@ -130,10 +139,9 @@ private class FirebaseBarcodeDetector {
 }
 
 
-class AsyncFirebaseBarcodeUriDetector(context: Context, listener: Listener)
+class AsyncFirebaseBarcodeUriDetector(context: Context, val listener: Listener)
     : AsyncTask< Uri, Unit, Unit? >() {
 
-    private val weakListener = WeakReference(listener)
     private val weakContext = WeakReference(context)
 
     private val detector = FirebaseBarcodeDetector()
@@ -146,7 +154,7 @@ class AsyncFirebaseBarcodeUriDetector(context: Context, listener: Listener)
 
         if (ctx != null && uri != null) {
             detector.scanner(ctx, uri) { barcodeModel ->
-                weakListener.get()?.onDetectorFinish(barcodeModel)
+                listener.onDetectorFinish(barcodeModel)
             }
         }
 
@@ -162,13 +170,11 @@ class AsyncFirebaseBarcodeUriDetector(context: Context, listener: Listener)
 
 
 class AsyncFirebaseBarcodeBufferDetector(
-    listener: Listener,
+    val listener: Listener,
     private val width: Int,
     private val height: Int
 ):
     AsyncTask< ByteBuffer, Unit, Unit? >() {
-
-    private val weakListener = WeakReference(listener)
 
     private val detector = FirebaseBarcodeDetector()
 
@@ -179,7 +185,7 @@ class AsyncFirebaseBarcodeBufferDetector(
 
         buffer?.let {
             detector.scanner(it, width, height) { barcodeModel ->
-                weakListener.get()?.onDetectorFinish(barcodeModel)
+                listener.onDetectorFinish(barcodeModel)
             }
         }
 

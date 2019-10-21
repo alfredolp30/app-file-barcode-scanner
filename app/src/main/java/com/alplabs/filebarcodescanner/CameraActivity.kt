@@ -181,7 +181,7 @@ class CameraActivity : BaseActivity(), AsyncFirebaseBarcodeBufferDetector.Listen
 
     private fun startBackgroundThread() {
         backgroundThread = HandlerThread("camera_background").also { it.start() }
-        backgroundHandler = Handler(backgroundThread?.looper)
+        backgroundHandler = Handler(backgroundThread!!.looper)
     }
 
     private fun stopBackgroundThread() {

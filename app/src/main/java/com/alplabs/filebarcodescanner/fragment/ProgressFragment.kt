@@ -13,11 +13,10 @@ import com.alplabs.filebarcodescanner.metrics.CALog
 import com.alplabs.filebarcodescanner.model.BarcodeModel
 import com.alplabs.filebarcodescanner.scanner.DetectorService
 import java.lang.ref.WeakReference
-import android.text.InputType
 import android.widget.EditText
 import android.app.AlertDialog
-import android.text.Layout
 import com.alplabs.filebarcodescanner.R
+import java.util.*
 
 
 private const val FILE_URI = "file_uri"
@@ -27,9 +26,6 @@ class ProgressFragment : BaseFragment(), AsyncHtml2Bitmap.Listener,
 
     private var listener: WeakReference<Listener>? = null
     private var uriFile: Uri? = null
-
-
-    private val detector = DetectorService(this)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -170,9 +166,8 @@ class ProgressFragment : BaseFragment(), AsyncHtml2Bitmap.Listener,
         val ctx = context
 
         if (uris.isNotEmpty() && ctx != null) {
-
-            detector.start(ctx, uris)
-
+            val detector = DetectorService(ctx, this, uris = ArrayDeque(uris))
+            detector.start()
         } else {
 
             listener?.get()?.onBarcodeScannerError()
