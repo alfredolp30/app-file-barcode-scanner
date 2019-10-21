@@ -25,12 +25,12 @@ class BarcodeModel(val barcode: String,
     constructor(parcel: Parcel) : this(
         barcode = parcel.readString() ?: "",
         isInvoiceCollection = parcel.readByte().toBoolean(),
-        date = GregorianCalendar().apply { timeInMillis = parcel.readLong() })
+        date = convertToGregorianCalendar(parcel.readLong()))
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(barcode)
         parcel.writeByte(isInvoiceCollection.toByte())
-        parcel.writeLong(date?.timeInMillis ?: 0)
+        parcel.writeLong(date?.timeInMillis ?: NONE_TIME_MILLIS)
     }
 
     override fun describeContents(): Int {
@@ -45,5 +45,21 @@ class BarcodeModel(val barcode: String,
         override fun newArray(size: Int): Array<BarcodeModel?> {
             return arrayOfNulls(size)
         }
+
+
+        const val NONE_TIME_MILLIS = -1L
+
+        fun convertToGregorianCalendar(value: Long) : GregorianCalendar? {
+
+            return if (value == NONE_TIME_MILLIS) {
+                null
+            } else {
+                GregorianCalendar().apply {
+                    timeInMillis = value
+                }
+            }
+        }
     }
+
+
 }
