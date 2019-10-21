@@ -32,52 +32,14 @@ private class FirebaseBarcodeDetector {
         FirebaseVision.getInstance().getVisionBarcodeDetector(options)
     }
 
-//    private var listener: AsyncFirebaseTextDateUriDetector.Listener? = null
-//    private var task: AsyncFirebaseTextDateUriDetector? = null
-    private val detectorDate = FirebaseTextDateDetector()
+    private val detectorDate by lazy { FirebaseTextDateDetector() }
 
     fun scanner(context: Context, uri: Uri, callback: (BarcodeModel?) -> Unit) {
 
         try {
 
             val image = FirebaseVisionImage.fromFilePath(context, uri)
-
-            detector.detectInImage(image)
-                .addOnSuccessListener { firebaseBarcodes ->
-
-                    CALog.d("SCANNER_BARCODE", "" + firebaseBarcodes)
-
-                    val barcode = firebaseBarcodes.firstOrNull()?.rawValue
-
-                    if (barcode != null) {
-                        val checker = InvoiceChecker(barcode)
-
-                        if (checker.isValid) {
-                            val isCollection = checker.isCollection
-
-                            if (checker.isCollection) {
-
-                                detectorDate.scanner(context, uri) { date ->
-                                    callback.invoke(BarcodeModel(barcode, isCollection, date))
-                                }
-
-                            } else {
-                                callback.invoke(BarcodeModel(barcode, isCollection, null))
-                            }
-
-                        } else {
-                            callback.invoke(null)
-                        }
-                    } else {
-                        callback.invoke(null)
-                    }
-
-                }.addOnFailureListener { ex ->
-
-                    CALog.e( "SCANNER_BARCODE", ex.message, ex)
-
-                    callback.invoke(null)
-                }
+            scanner(image, callback)
 
         } catch (ex: IOException) {
 
@@ -85,6 +47,7 @@ private class FirebaseBarcodeDetector {
 
             callback.invoke(null)
         }
+
     }
 
 
@@ -100,34 +63,7 @@ private class FirebaseBarcodeDetector {
                 .build()
 
             val image = FirebaseVisionImage.fromByteBuffer(buffer, metadata)
-
-            detector.detectInImage(image)
-                .addOnSuccessListener { firebaseBarcodes ->
-
-                    CALog.d("SCANNER_BARCODE", "" + firebaseBarcodes)
-
-                    val barcode = firebaseBarcodes.firstOrNull()?.rawValue
-
-                    if (barcode != null) {
-                        val checker = InvoiceChecker(barcode)
-
-                        if (checker.isValid) {
-                            val isCollection = checker.isCollection
-
-                            callback.invoke(BarcodeModel(barcode, isCollection, null))
-                        } else {
-                            callback.invoke(null)
-                        }
-                    } else {
-                        callback.invoke(null)
-                    }
-
-                }.addOnFailureListener { exception ->
-
-                    CALog.e( "SCANNER_BARCODE", exception.message)
-
-                    callback.invoke(null)
-                }
+            scanner(image, callback)
 
         } catch (th: Throwable) {
 
@@ -135,6 +71,48 @@ private class FirebaseBarcodeDetector {
 
             callback.invoke(null)
         }
+    }
+
+
+    private fun scanner(image: FirebaseVisionImage, callback: (BarcodeModel?) -> Unit) {
+
+        detector.detectInImage(image)
+            .addOnSuccessListener { firebaseBarcodes ->
+
+                CALog.d("SCANNER_BARCODE", "" + firebaseBarcodes)
+
+                val barcode = firebaseBarcodes.firstOrNull()?.rawValue
+
+                if (barcode != null) {
+                    val checker = InvoiceChecker(barcode)
+
+                    if (checker.isValid) {
+                        val isCollection = checker.isCollection
+
+                        if (checker.isCollection) {
+
+                            detectorDate.scanner(image) { date ->
+                                callback.invoke(BarcodeModel(barcode, isCollection, date))
+                            }
+
+                        } else {
+                            callback.invoke(BarcodeModel(barcode, isCollection, null))
+                        }
+
+                    } else {
+                        callback.invoke(null)
+                    }
+                } else {
+                    callback.invoke(null)
+                }
+
+            }
+            .addOnFailureListener { ex ->
+
+                CALog.e( "SCANNER_BARCODE", ex.message, ex)
+
+                callback.invoke(null)
+            }
     }
 }
 

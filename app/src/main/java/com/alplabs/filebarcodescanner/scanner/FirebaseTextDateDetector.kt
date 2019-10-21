@@ -33,14 +33,9 @@ class FirebaseTextDateDetector {
             ))
     }
 
-    fun scanner(context: Context, uri: Uri, callback: (GregorianCalendar?) -> Unit) {
-
-        val image: FirebaseVisionImage
+    fun scanner(image: FirebaseVisionImage, callback: (GregorianCalendar?) -> Unit) {
 
         try {
-            image = FirebaseVisionImage.fromFilePath(context, uri)
-
-
             detector.processImage(image)
                 .addOnSuccessListener { firebaseVisionText ->
 
@@ -95,36 +90,4 @@ class FirebaseTextDateDetector {
     }
 
 
-}
-
-
-
-
-class AsyncFirebaseTextDateUriDetector(context: Context, listener: Listener)
-    : AsyncTask<Uri, Unit, Unit?>() {
-
-    private val weakListener = WeakReference(listener)
-    private val weakContext = WeakReference(context)
-
-    private val detector = FirebaseTextDateDetector()
-
-    override fun doInBackground(vararg params: Uri?): Unit? {
-
-        val uri = params[0]
-        val ctx = weakContext.get()
-
-
-        if (ctx != null && uri != null) {
-            detector.scanner(ctx, uri) { date ->
-                weakListener.get()?.onDetectorFinish(date)
-            }
-        }
-
-        return null
-    }
-
-
-    interface Listener {
-        fun onDetectorFinish(date: GregorianCalendar?)
-    }
 }
