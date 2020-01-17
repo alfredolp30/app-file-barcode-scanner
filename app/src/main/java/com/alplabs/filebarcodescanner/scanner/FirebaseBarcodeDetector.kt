@@ -5,7 +5,7 @@ import android.net.Uri
 import android.os.AsyncTask
 import com.alplabs.filebarcodescanner.invoice.InvoiceChecker
 import com.alplabs.filebarcodescanner.metrics.CALog
-import com.alplabs.filebarcodescanner.model.BarcodeModel
+import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetector
@@ -15,7 +15,6 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import java.io.IOException
 import java.lang.ref.WeakReference
 import java.nio.ByteBuffer
-import java.util.*
 
 /**
  * Created by Alfredo L. Porfirio on 01/03/19.
@@ -87,16 +86,15 @@ private class FirebaseBarcodeDetector {
                     val checker = InvoiceChecker(barcode)
 
                     if (checker.isValid) {
-                        val isCollection = checker.isCollection
 
                         if (checker.isCollection) {
 
                             detectorDate.scanner(image) { date ->
-                                callback.invoke(BarcodeModel(barcode, isCollection, date))
+                                callback.invoke(BarcodeModel(barcode, date))
                             }
 
                         } else {
-                            callback.invoke(BarcodeModel(barcode, isCollection, null))
+                            callback.invoke(BarcodeModel(barcode, null))
                         }
 
                     } else {

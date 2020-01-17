@@ -9,7 +9,7 @@
     <string name="initial">Selecione um arquivo ou a câmera para encontrar o código de barras.</string>
     <string name="barcode_copy_success">Copiado com sucesso.</string>
 
-    <string name="without_date">Sem data.</string>
+    <string name="without_date">Sem data</string>
     <string name="value">R$ %1$s</string>
     <string name="copy">Copiar</string>
     <string name="pay">Vencimento em</string>

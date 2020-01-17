@@ -5,20 +5,16 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
-import android.view.ContextMenu
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.FragmentTransaction
+import com.alplabs.filebarcodescanner.database.DatabaseManager
 import com.alplabs.filebarcodescanner.fragment.BarcodeFragment
 import com.alplabs.filebarcodescanner.fragment.InitialFragment
 import com.alplabs.filebarcodescanner.fragment.ProgressFragment
 import com.alplabs.filebarcodescanner.metrics.CALog
-import com.alplabs.filebarcodescanner.model.BarcodeModel
+import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
 
 import kotlinx.android.synthetic.main.activity_barcode.*
-import kotlinx.android.synthetic.main.cell_initial.*
 
 open class BarcodeActivity : BaseActivity(), InitialFragment.Listener, ProgressFragment.Listener {
 
@@ -184,6 +180,20 @@ open class BarcodeActivity : BaseActivity(), InitialFragment.Listener, ProgressF
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .replace(R.id.frame, BarcodeFragment.newInstance(barcodeModels))
             .commitAllowingStateLoss()
+
+        DatabaseManager.executeInBackground(
+            execution = {
+                appBarcode?.let { appBarcode ->
+                    barcodeModels.forEach {
+                        appBarcode.database.barcodeDataDao().add(it.barcodeData)
+                    }
+                }
+            },
+
+            resultCallback = {
+
+            }
+        )
 
     }
 

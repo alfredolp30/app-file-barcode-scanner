@@ -2,12 +2,10 @@ package com.alplabs.filebarcodescanner.fragment
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.alplabs.filebarcodescanner.R
-import com.alplabs.filebarcodescanner.model.BarcodeModel
 import kotlinx.android.synthetic.main.cell_initial.view.*
 import java.lang.ref.WeakReference
 

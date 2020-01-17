@@ -1,6 +1,8 @@
 package com.alplabs.filebarcodescanner
 
 import android.app.Application
+import com.alplabs.filebarcodescanner.database.AppDatabase
+import com.alplabs.filebarcodescanner.database.DatabaseManager
 import com.alplabs.filebarcodescanner.metrics.CAAnalytics
 import com.alplabs.filebarcodescanner.metrics.CALog
 /**
@@ -16,4 +18,5 @@ class AppBarcode : Application() {
     }
 
     val analytics: CAAnalytics by lazy { CAAnalytics(applicationContext) }
+    val database: AppDatabase by lazy { DatabaseManager.createDatabase(applicationContext) }
 }

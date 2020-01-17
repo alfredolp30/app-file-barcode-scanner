@@ -2,7 +2,7 @@ package com.alplabs.filebarcodescanner.scanner
 
 import android.content.Context
 import android.net.Uri
-import com.alplabs.filebarcodescanner.model.BarcodeModel
+import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
 import java.lang.ref.WeakReference
 import java.util.*
 

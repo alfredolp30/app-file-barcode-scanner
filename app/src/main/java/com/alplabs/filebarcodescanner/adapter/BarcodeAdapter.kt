@@ -4,9 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.alplabs.filebarcodescanner.R
-import com.alplabs.filebarcodescanner.extension.setTextWithValue
-import com.alplabs.filebarcodescanner.invoice.InvoiceCollection
-import com.alplabs.filebarcodescanner.model.BarcodeModel
+import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
 import kotlinx.android.synthetic.main.cell_barcode.view.*
 import java.lang.ref.WeakReference
 import java.text.DecimalFormat
@@ -41,13 +39,13 @@ class BarcodeAdapter(val barcodeModels: MutableList<BarcodeModel>, listener: Lis
         val barcodeModel = barcodeModels[position]
 
         val barcode = barcodeModel.invoice.barcodeWithDigits
-        val date = barcodeModel.invoice.date
+        val calendar = barcodeModel.invoice.calendar
         val value = barcodeModel.invoice.value
 
         holder.itemView.txtBarcode.text = barcode
 
-        if (date != null) {
-            holder.itemView.txtDate.text = sdf.format(date.time)
+        if (calendar != null) {
+            holder.itemView.txtDate.text = sdf.format(calendar.time)
         } else {
             holder.itemView.txtDate.setText(R.string.without_date)
         }

@@ -10,7 +10,7 @@ import android.webkit.MimeTypeMap
 import com.alplabs.filebarcodescanner.scanner.AsyncHtml2Bitmap
 import com.alplabs.filebarcodescanner.scanner.AsyncPdf2Bitmap
 import com.alplabs.filebarcodescanner.metrics.CALog
-import com.alplabs.filebarcodescanner.model.BarcodeModel
+import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
 import com.alplabs.filebarcodescanner.scanner.DetectorService
 import java.lang.ref.WeakReference
 import android.widget.EditText

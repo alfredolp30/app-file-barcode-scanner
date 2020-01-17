@@ -30,7 +30,7 @@ class InvoiceBank(private val barcode: String) : InvoiceBase() {
 
     private val factorExpiration: Int get() = barcode.substring(5, 9).trimStart { it == '0' }.toIntOrNull() ?: 0
 
-    override val date : GregorianCalendar? get() {
+    override val calendar : GregorianCalendar? get() {
         val calendar = GregorianCalendar()
 
         calendar.set(1997, 9, 7)

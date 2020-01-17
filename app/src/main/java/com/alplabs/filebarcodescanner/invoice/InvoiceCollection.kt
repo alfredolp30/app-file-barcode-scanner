@@ -10,7 +10,7 @@ import kotlin.math.abs
  * Copyright Universo Online 2019. All rights reserved.
  */
 class InvoiceCollection(private val barcode: String,
-                        override val date: GregorianCalendar?) : InvoiceBase() {
+                        override val calendar: GregorianCalendar?) : InvoiceBase() {
 
     private val effectiveValue: String by lazy { barcode.substring(2, 3) }
 

@@ -13,7 +13,7 @@ import android.os.Handler
 import android.os.HandlerThread
 import com.alplabs.filebarcodescanner.metrics.CALog
 import android.media.ImageReader.OnImageAvailableListener
-import com.alplabs.filebarcodescanner.model.BarcodeModel
+import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
 import com.alplabs.filebarcodescanner.scanner.AsyncFirebaseBarcodeBufferDetector
 import android.content.Intent
 import android.media.ImageReader.newInstance

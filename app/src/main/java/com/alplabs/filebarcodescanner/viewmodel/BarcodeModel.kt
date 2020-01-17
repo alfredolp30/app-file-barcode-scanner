@@ -1,10 +1,11 @@
-package com.alplabs.filebarcodescanner.model
+package com.alplabs.filebarcodescanner.viewmodel
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.alplabs.filebarcodescanner.database.model.BarcodeData
 import com.alplabs.filebarcodescanner.extension.toBoolean
-import com.alplabs.filebarcodescanner.extension.toByte
 import com.alplabs.filebarcodescanner.invoice.InvoiceBank
+import com.alplabs.filebarcodescanner.invoice.InvoiceChecker
 import com.alplabs.filebarcodescanner.invoice.InvoiceCollection
 import com.alplabs.filebarcodescanner.invoice.InvoiceInterface
 import java.util.*
@@ -15,22 +16,30 @@ import java.util.*
  * Copyright Universo Online 2019. All rights reserved.
  */
 class BarcodeModel(val barcode: String,
-                   private val isInvoiceCollection: Boolean,
-                   private val date: GregorianCalendar?) : Parcelable {
+                   private val calendar: GregorianCalendar?) : Parcelable {
 
     val invoice : InvoiceInterface by lazy {
-        if (isInvoiceCollection) InvoiceCollection(barcode, date) else InvoiceBank(barcode)
+        if (InvoiceChecker(barcode).isCollection) InvoiceCollection(barcode, calendar) else InvoiceBank(barcode)
+    }
+
+    val barcodeData : BarcodeData by lazy {
+
+        BarcodeData(
+            barcode = barcode,
+            datetime = calendar?.timeInMillis,
+            readDatetime = GregorianCalendar().timeInMillis
+        )
+
     }
 
     constructor(parcel: Parcel) : this(
         barcode = parcel.readString() ?: "",
-        isInvoiceCollection = parcel.readByte().toBoolean(),
-        date = convertToGregorianCalendar(parcel.readLong()))
+        calendar = convertToGregorianCalendar(parcel.readLong())
+    )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(barcode)
-        parcel.writeByte(isInvoiceCollection.toByte())
-        parcel.writeLong(date?.timeInMillis ?: NONE_TIME_MILLIS)
+        parcel.writeLong(calendar?.timeInMillis ?: NONE_TIME_MILLIS)
     }
 
     override fun describeContents(): Int {
