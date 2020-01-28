@@ -13,6 +13,7 @@ import com.alplabs.filebarcodescanner.R
 import com.alplabs.filebarcodescanner.adapter.BarcodeAdapter
 import com.alplabs.filebarcodescanner.database.DatabaseManager
 import com.alplabs.filebarcodescanner.metrics.CALog
+import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
 import kotlinx.android.synthetic.main.fragment_barcode.view.*
 
 
@@ -46,11 +47,10 @@ class BarcodeFragment :
 
                 resultCallback = {
 
-                    it?.let{ barcodeModels ->
-                        view?.progressBar?.visibility = View.GONE
+                    view?.progressBar?.visibility = View.GONE
 
-                        adapter.barcodeModels.addAll(barcodeModels)
-                        adapter.notifyDataSetChanged()
+                    it?.let{ barcodeModels ->
+                        loadData(barcodeModels)
                     }
                 }
             )
@@ -62,16 +62,20 @@ class BarcodeFragment :
 
                 resultCallback = {
 
-                    it?.let{ barcodeModel ->
-                        view?.progressBar?.visibility = View.GONE
+                    view?.progressBar?.visibility = View.GONE
 
-                        adapter.barcodeModels.add(barcodeModel)
-                        adapter.notifyDataSetChanged()
+                    it?.let{ barcodeModel ->
+                        loadData(listOf(barcodeModel))
                     }
                 }
             )
         }
 
+    }
+
+    private fun loadData(barcodeModels: List<BarcodeModel>) {
+        adapter.barcodeModels.addAll(barcodeModels)
+        adapter.notifyDataSetChanged()
     }
 
     override fun onCreateView(
