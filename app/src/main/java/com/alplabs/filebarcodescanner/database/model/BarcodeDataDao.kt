@@ -12,6 +12,9 @@ interface BarcodeDataDao {
     @Query("SELECT * FROM BarcodeData")
     fun list() : List<BarcodeData>
 
+    @Query("SELECT * FROM BarcodeData ORDER BY readDatetime DESC LIMIT 1")
+    fun last() : BarcodeData
+
     @Insert(onConflict = REPLACE)
     fun add(barcodeData: BarcodeData): Long?
 

@@ -31,18 +31,12 @@ object DatabaseManager {
 
 }
 
-interface Listener<T> {
-    fun onFinish(result: T?)
-}
-
 class AsyncTaskLoad<T>(
 
     private val execution: () -> T,
-    resultCallback: ((T) -> Unit)?
+    private val resultCallback: ((T) -> Unit)?
 
 ): AsyncTask<Unit, Unit, T>() {
-
-    private val weakCallback = WeakReference(resultCallback)
 
     override fun doInBackground(vararg p0: Unit?): T {
         return execution.invoke()
@@ -50,6 +44,6 @@ class AsyncTaskLoad<T>(
 
     override fun onPostExecute(result: T) {
         super.onPostExecute(result)
-        weakCallback.get()?.invoke(result)
+        resultCallback?.invoke(result)
     }
 }

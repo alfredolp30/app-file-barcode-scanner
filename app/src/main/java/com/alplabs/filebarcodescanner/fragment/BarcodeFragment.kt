@@ -11,13 +11,16 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alplabs.filebarcodescanner.R
 import com.alplabs.filebarcodescanner.adapter.BarcodeAdapter
-import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
-import kotlinx.android.synthetic.main.fragment_barcodes.view.*
+import com.alplabs.filebarcodescanner.database.DatabaseManager
+import com.alplabs.filebarcodescanner.metrics.CALog
+import kotlinx.android.synthetic.main.fragment_barcode.view.*
 
 
-private const val BARCODE = "barcode"
+private const val LOAD_ALL_BARCODE = "load_all_barcode"
 
-class BarcodeFragment : BaseFragment(), BarcodeAdapter.Listener {
+class BarcodeFragment :
+    BaseFragment(),
+    BarcodeAdapter.Listener {
 
 
     private val clipboardManager get() = context?.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
@@ -27,11 +30,48 @@ class BarcodeFragment : BaseFragment(), BarcodeAdapter.Listener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        arguments?.let {
-           it.getParcelableArray(BARCODE)?.filter { item -> item is BarcodeModel }?.forEach { item ->
-               adapter.barcodeModels.add(item as BarcodeModel)
-           }
+        val loadAllBarcode = arguments?.getBoolean(LOAD_ALL_BARCODE) ?: true
+        loadData(loadAllBarcode)
+
+    }
+
+    private fun loadData(isAll: Boolean) {
+        val database = appBarcode?.database ?: return
+
+        if (isAll) {
+            DatabaseManager.executeInBackground(
+                execution = {
+                    database.barcodeDataDao().list().reversed().map { it.toBarcodeModel() }
+                },
+
+                resultCallback = {
+
+                    it?.let{ barcodeModels ->
+                        view?.progressBar?.visibility = View.GONE
+
+                        adapter.barcodeModels.addAll(barcodeModels)
+                        adapter.notifyDataSetChanged()
+                    }
+                }
+            )
+        } else {
+            DatabaseManager.executeInBackground(
+                execution = {
+                    database.barcodeDataDao().last().toBarcodeModel()
+                },
+
+                resultCallback = {
+
+                    it?.let{ barcodeModel ->
+                        view?.progressBar?.visibility = View.GONE
+
+                        adapter.barcodeModels.add(barcodeModel)
+                        adapter.notifyDataSetChanged()
+                    }
+                }
+            )
         }
+
     }
 
     override fun onCreateView(
@@ -39,7 +79,7 @@ class BarcodeFragment : BaseFragment(), BarcodeAdapter.Listener {
         savedInstanceState: Bundle?
     ): View? {
 
-        val view = inflater.inflate(R.layout.fragment_barcodes, container, false)
+        val view = inflater.inflate(R.layout.fragment_barcode, container, false)
 
         view.rcBarcode.layoutManager = LinearLayoutManager(requireContext())
         view.rcBarcode.adapter = adapter
@@ -56,11 +96,11 @@ class BarcodeFragment : BaseFragment(), BarcodeAdapter.Listener {
 
     companion object {
         @JvmStatic
-        fun newInstance(barcodeModels: List<BarcodeModel>) =
+        fun newInstance(loadAllBarcode: Boolean) =
 
             BarcodeFragment().apply {
                 arguments = Bundle().apply {
-                    putParcelableArray(BARCODE, barcodeModels.toTypedArray())
+                    putBoolean(LOAD_ALL_BARCODE, loadAllBarcode)
                 }
             }
 

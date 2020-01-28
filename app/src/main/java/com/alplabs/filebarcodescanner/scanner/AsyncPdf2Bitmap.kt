@@ -24,11 +24,14 @@ import com.shockwave.pdfium.PdfPasswordException
  * Created by Alfredo L. Porfirio on 26/02/19.
  * Copyright Universo Online 2019. All rights reserved.
  */
-class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<AsyncPdf2Bitmap.WorkPdf, Unit, AsyncPdf2Bitmap.DataResult>() {
+class AsyncPdf2Bitmap(context: Context, listener: Listener) :
+    AsyncTask<AsyncPdf2Bitmap.WorkPdf,
+    Unit,
+    AsyncPdf2Bitmap.DataResult>() {
 
     interface Listener {
         fun onFinishPdf2Bitmap(uris: List<Uri>)
-        fun onRequiredPassword(fileName: String)
+        fun onRequiredPassword(uri: Uri, fileName: String)
     }
 
     private val weakContext = WeakReference(context)
@@ -41,6 +44,7 @@ class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<AsyncPdf
 
 
     data class DataResult(
+        val sourceUri: Uri,
         var fileName: String,
         val uris: MutableList<Uri>,
         var requiredPassword: Boolean
@@ -51,7 +55,7 @@ class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<AsyncPdf
 
         val workPdf = params[0] as WorkPdf
 
-        val dataResult = DataResult("", mutableListOf(), false)
+        val dataResult = DataResult(workPdf.uri, "", mutableListOf(), false)
 
         weakContext.get()?.let { ctx ->
 
@@ -128,7 +132,7 @@ class AsyncPdf2Bitmap(context: Context, listener: Listener) : AsyncTask<AsyncPdf
         super.onPostExecute(result)
 
         if (result?.requiredPassword == true) {
-            weakListener.get()?.onRequiredPassword(result.fileName)
+            weakListener.get()?.onRequiredPassword(result.sourceUri, result.fileName)
         } else {
             weakListener.get()?.onFinishPdf2Bitmap(result?.uris ?: listOf())
         }
