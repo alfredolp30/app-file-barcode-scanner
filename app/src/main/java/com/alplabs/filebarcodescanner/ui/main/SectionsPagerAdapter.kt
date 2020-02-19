@@ -25,7 +25,7 @@ class SectionsPagerAdapter(private val context: Context, fm: FragmentManager) :
         // Return a PlaceholderFragment (defined as a static inner class below).
         return when (position) {
             0 -> InitialFragment()
-            else -> BarcodeFragment.newInstance(loadAllBarcode = true)
+            else -> BarcodeFragment()
         }
     }
 

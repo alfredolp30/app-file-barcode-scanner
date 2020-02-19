@@ -12,7 +12,6 @@ import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetector
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
-import java.io.IOException
 import java.lang.ref.WeakReference
 import java.nio.ByteBuffer
 
@@ -40,9 +39,9 @@ private class FirebaseBarcodeDetector {
             val image = FirebaseVisionImage.fromFilePath(context, uri)
             scanner(image, callback)
 
-        } catch (ex: IOException) {
+        } catch (th: Throwable) {
 
-            CALog.e("scannerBarcode", ex.message, ex)
+            CALog.e("scannerBarcode", th.message, th)
 
             callback.invoke(null)
         }

@@ -24,7 +24,6 @@ open class TabMainActivity :
     companion object {
 
         val REQUEST_CODE_FILE = nextRequestCode()
-        val RESULT_CODE_CAMERA_ACTIVITY = nextRequestCode()
 
     }
 
@@ -90,7 +89,7 @@ open class TabMainActivity :
     private fun cameraCapture() {
 
         Intent(this, CameraActivity::class.java).also {
-            startActivityForResult(it, RESULT_CODE_CAMERA_ACTIVITY)
+            startActivity(it)
         }
 
     }
@@ -108,19 +107,6 @@ open class TabMainActivity :
 
                 } else {
                     CALog.i("PICKER_FILE", "cancelled")
-                }
-            }
-
-            RESULT_CODE_CAMERA_ACTIVITY -> {
-                if (resultCode == Activity.RESULT_OK) {
-
-                    val barcodeModels =
-                        data?.extras?.getParcelableArrayList<BarcodeModel>(CameraActivity.BARCODE) ?: arrayListOf()
-
-                    saveBarcodeAndShow(barcodeModels)
-
-                } else {
-                    CALog.i("CAMERA_ACTIVITY", "cancelled")
                 }
             }
 
@@ -182,29 +168,6 @@ open class TabMainActivity :
             alert?.show()
             bdm.start(uri)
         }
-
-    }
-
-
-    private fun saveBarcodeAndShow(barcodeModels: List<BarcodeModel>) {
-
-        DatabaseManager.executeInBackground(
-            execution = {
-                appBarcode?.let { appBarcode ->
-                    barcodeModels.forEach {
-                        appBarcode.database.barcodeDataDao().add(it.barcodeData)
-                    }
-                }
-            },
-
-            resultCallback = {
-
-                Intent(this, BarcodeActivity::class.java).also {
-                    startActivity(it)
-                }
-
-            }
-        )
 
     }
 }

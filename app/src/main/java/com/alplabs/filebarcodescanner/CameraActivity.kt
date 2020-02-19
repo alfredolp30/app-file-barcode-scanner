@@ -300,11 +300,8 @@ class CameraActivity : BaseActivity(), AsyncFirebaseBarcodeBufferDetector.Listen
         barcodeModel?.let { model ->
             CALog.i(CameraActivity::onDetectorFinish.name, "Found barcode with camera")
 
-            Intent().also {
-                it.putParcelableArrayListExtra(BARCODE, arrayListOf(model))
-                setResult(Activity.RESULT_OK, it)
-                finish()
-            }
+            finish()
+            saveBarcodeAndShow(listOf(model))
         }
 
     }

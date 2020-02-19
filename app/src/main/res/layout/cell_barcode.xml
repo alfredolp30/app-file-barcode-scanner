@@ -51,38 +51,45 @@
                         android:textSize="16sp" android:textStyle="bold"/>
             </LinearLayout>
         </LinearLayout>
-        <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:id="@+id/linearLayout">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
             <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/txtBarcode"
-                    android:textSize="16sp"
-                    android:textIsSelectable="true"
-                    android:text="CODEBAR"
-                    android:layout_marginEnd="8dp"
-                    android:layout_gravity="top"
-                    android:textColor="@android:color/black"
-                    android:layout_weight="1"
-            />
+                android:id="@+id/txtBarcode"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="CODEBAR"
+                android:textColor="@android:color/black"
+                android:textIsSelectable="true"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@+id/btnCopy"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <Button
-                    android:text="@string/copy"
-                    android:background="@drawable/layer_button_background"
-                    android:layout_width="wrap_content"
-                    android:drawablePadding="16dp"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp"
-                    android:layout_gravity="top"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:id="@+id/btnCopy" android:layout_height="32dp"
-                    android:drawableStart="@drawable/ic_copy" android:textColor="@android:color/white"
-            />
-        </LinearLayout>
+                android:id="@+id/btnCopy"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:background="@drawable/layer_button_copy_background"
+                android:drawableStart="@drawable/ic_copy"
+                android:drawablePadding="16dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:text="@string/copy"
+                android:textColor="@android:color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/txtBarcode"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

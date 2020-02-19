@@ -2,6 +2,7 @@ package com.alplabs.filebarcodescanner.database.model
 
 import androidx.room.Entity
 import androidx.room.Ignore
+import com.alplabs.filebarcodescanner.viewmodel.BarcodeHistoryModel
 import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
 import java.util.*
 
@@ -18,15 +19,28 @@ class BarcodeData(
 
 ) {
 
-    fun toBarcodeModel() = BarcodeModel(barcode = barcode, calendar = datetimeToCalendar(datetime))
+    fun toBarcodeModel() = BarcodeModel(
+        barcode = barcode,
+        calendar = datetimeToCalendar(datetime)
+    )
 
+
+    fun toBarcodeHistoryModel() = BarcodeHistoryModel(
+        barcode = barcode,
+        calendar = datetimeToCalendar(datetime),
+        readCalendar = datetimeToCalendar(readDatetime)
+    )
 
 
     companion object {
 
+        fun datetimeToCalendar(datetime: Long): GregorianCalendar {
+            return GregorianCalendar().apply { timeInMillis = datetime }
+        }
+
         fun datetimeToCalendar(datetime: Long?) : GregorianCalendar? {
             return if (datetime != null) {
-                GregorianCalendar().apply { timeInMillis = datetime }
+                datetimeToCalendar(datetime)
             } else {
                 null
             }

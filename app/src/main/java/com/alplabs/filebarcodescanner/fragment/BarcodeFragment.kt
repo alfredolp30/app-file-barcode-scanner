@@ -10,73 +10,23 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alplabs.filebarcodescanner.R
-import com.alplabs.filebarcodescanner.adapter.BarcodeAdapter
+import com.alplabs.filebarcodescanner.adapter.Barcode2Adapter
 import com.alplabs.filebarcodescanner.database.DatabaseManager
-import com.alplabs.filebarcodescanner.metrics.CALog
-import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
+import com.alplabs.filebarcodescanner.database.model.BarcodeData
+import com.alplabs.filebarcodescanner.viewmodel.BarcodeHistoryModel
 import kotlinx.android.synthetic.main.fragment_barcode.view.*
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 
-
-private const val LOAD_ALL_BARCODE = "load_all_barcode"
 
 class BarcodeFragment :
     BaseFragment(),
-    BarcodeAdapter.Listener {
-
+    Barcode2Adapter.Listener {
 
     private val clipboardManager get() = context?.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
 
-    private val adapter = BarcodeAdapter(mutableListOf(), this)
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        val loadAllBarcode = arguments?.getBoolean(LOAD_ALL_BARCODE) ?: true
-        loadData(loadAllBarcode)
-
-    }
-
-    private fun loadData(isAll: Boolean) {
-        val database = appBarcode?.database ?: return
-
-        if (isAll) {
-            DatabaseManager.executeInBackground(
-                execution = {
-                    database.barcodeDataDao().list().reversed().map { it.toBarcodeModel() }
-                },
-
-                resultCallback = {
-
-                    view?.progressBar?.visibility = View.GONE
-
-                    it?.let{ barcodeModels ->
-                        loadData(barcodeModels)
-                    }
-                }
-            )
-        } else {
-            DatabaseManager.executeInBackground(
-                execution = {
-                    database.barcodeDataDao().last().toBarcodeModel()
-                },
-
-                resultCallback = {
-
-                    view?.progressBar?.visibility = View.GONE
-
-                    it?.let{ barcodeModel ->
-                        loadData(listOf(barcodeModel))
-                    }
-                }
-            )
-        }
-
-    }
-
-    private fun loadData(barcodeModels: List<BarcodeModel>) {
-        adapter.barcodeModels.addAll(barcodeModels)
-        adapter.notifyDataSetChanged()
-    }
+    private val adapter = Barcode2Adapter(mutableListOf(), this)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -91,22 +41,88 @@ class BarcodeFragment :
         return view
     }
 
-    override fun onCopy(rawValue: String) {
-        clipboardManager?.setPrimaryClip(ClipData.newPlainText("barcode", rawValue))
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        loadData()
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        EventBus.getDefault().register(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        EventBus.getDefault().unregister(this)
+    }
+
+    private fun loadData() {
+        val database = appBarcode?.database ?: return
+
+        DatabaseManager.executeInBackground(
+            execution = {
+                database.barcodeDataDao().list().reversed().map { it.toBarcodeHistoryModel() }
+            },
+
+            resultCallback = {
+
+                view?.progressBar?.visibility = View.GONE
+
+                it?.let{ barcodeModels ->
+                    loadData(barcodeModels)
+                }
+            }
+        )
+
+
+    }
+
+    private fun loadData(barcodeModels: List<BarcodeHistoryModel>) {
+        adapter.barcodeModels.addAll(barcodeModels)
+        adapter.notifyDataSetChanged()
+    }
+
+    override fun onCopy(barcodeWithDigits: String) {
+        clipboardManager?.setPrimaryClip(ClipData.newPlainText("barcode", barcodeWithDigits))
 
         baseActivity?.showToast(getString(R.string.barcode_copy_success))
     }
 
+    override fun onDelete(barcodeModel: BarcodeHistoryModel) {
+        val database = appBarcode?.database ?: return
 
-    companion object {
-        @JvmStatic
-        fun newInstance(loadAllBarcode: Boolean) =
+        DatabaseManager.executeInBackground(
+            execution = {
+                database.barcodeDataDao().remove(barcodeModel.barcodeData)
+            },
 
-            BarcodeFragment().apply {
-                arguments = Bundle().apply {
-                    putBoolean(LOAD_ALL_BARCODE, loadAllBarcode)
+            resultCallback = {
+
+                val index = adapter.barcodeModels.indexOfFirst { model -> model.barcode == barcodeModel.barcode }
+
+                if (index >= 0) {
+                    adapter.barcodeModels.removeAt(index)
+                    adapter.notifyItemRemoved(index)
                 }
+
             }
+        )
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onMessageEvent(barcodeData: BarcodeData) {
+
+        val index = adapter.barcodeModels.indexOfFirst { b -> b.barcode == barcodeData.barcode }
+        if (index >= 0) {
+            adapter.barcodeModels.removeAt(index)
+            adapter.notifyItemRemoved(index)
+        }
+
+        adapter.barcodeModels.add(0, barcodeData.toBarcodeHistoryModel())
+        adapter.notifyItemInserted(0)
 
     }
 }

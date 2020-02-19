@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
                 android:layout_weight="1"
-                android:background="@drawable/layer_button_background"
+                android:background="@drawable/layer_button_copy_background"
                 android:text="@string/title_archive"
                 android:foreground="?attr/selectableItemBackground"
                 android:textColor="@android:color/white" />
@@ -55,7 +55,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/layer_button_background"
+                android:background="@drawable/layer_button_copy_background"
                 android:text="@string/title_camera"
                 android:foreground="?attr/selectableItemBackground"
                 android:textColor="@android:color/white" />
