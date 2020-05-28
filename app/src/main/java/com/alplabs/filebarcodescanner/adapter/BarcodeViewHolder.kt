@@ -11,6 +11,7 @@ import com.alplabs.filebarcodescanner.R
  * Copyright Universo Online 2019. All rights reserved.
  */
 class BarcodeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    val txtTitle : TextView? = view.findViewById(R.id.txtTitle)
     val txtBarcode : TextView? = view.findViewById(R.id.txtBarcode)
     val txtDate : TextView? = view.findViewById(R.id.txtDate)
     val txtValue : TextView? = view.findViewById(R.id.txtValue)

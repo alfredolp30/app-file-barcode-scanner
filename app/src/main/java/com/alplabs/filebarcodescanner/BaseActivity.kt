@@ -5,6 +5,7 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.alplabs.filebarcodescanner.database.DatabaseManager
+import com.alplabs.filebarcodescanner.eventbus.NewBarcodeData
 import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
 import org.greenrobot.eventbus.EventBus
 
@@ -33,19 +34,16 @@ open class BaseActivity : AppCompatActivity() {
     protected fun saveBarcodeAndShow(barcodeModels: List<BarcodeModel>) {
         val database = appBarcode?.database ?: return
 
+        val barcodeData = barcodeModels.first().barcodeData
+
         DatabaseManager.executeInBackground(
             execution = {
-                barcodeModels.forEach {
-
-                    val barcodeData = it.barcodeData
-                    database.barcodeDataDao().add(barcodeData)
-
-                    EventBus.getDefault().post(barcodeData)
-
-                }
+                database.barcodeDataDao().add(barcodeData)
             },
 
             resultCallback = {
+
+                EventBus.getDefault().post(NewBarcodeData(barcodeData))
 
                 Intent(this, BarcodeActivity::class.java).also {
                     startActivity(it)

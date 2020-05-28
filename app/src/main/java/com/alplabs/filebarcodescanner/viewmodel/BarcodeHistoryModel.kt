@@ -9,11 +9,13 @@ import java.util.*
  * Copyright Universo Online 2020. All rights reserved.
  */
 class BarcodeHistoryModel(
+
     barcode: String,
     calendar: GregorianCalendar?,
-    val readCalendar: GregorianCalendar
+    val readCalendar: GregorianCalendar,
+    title: String
 
-) : BarcodeModel(barcode, calendar) {
+) : BarcodeModel(barcode, calendar, title) {
 
 
     override val barcodeData : BarcodeData
@@ -22,7 +24,8 @@ class BarcodeHistoryModel(
             return BarcodeData(
                 barcode = barcode,
                 datetime = calendar?.timeInMillis,
-                readDatetime = readCalendar.timeInMillis
+                readDatetime = readCalendar.timeInMillis,
+                title = title
             )
 
         }

@@ -23,4 +23,8 @@
     <string name="history_invoice">Histórico de boletos</string>
     <string name="was_read_in">Lido em</string>
     <string name="delete">Excluir</string>
+
+    <string name="invoice_alert_title">Nome</string>
+    <string name="hint_alert_title">Escreva um nome</string>
+    <string name="invoice_title_default">Sem nome</string>
 </resources>

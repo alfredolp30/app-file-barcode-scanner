@@ -8,16 +8,22 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alplabs.filebarcodescanner.adapter.Barcode2Adapter
 import com.alplabs.filebarcodescanner.database.DatabaseManager
+import com.alplabs.filebarcodescanner.eventbus.ChangedBarcodeData
 import com.alplabs.filebarcodescanner.viewmodel.BarcodeHistoryModel
 import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
 import kotlinx.android.synthetic.main.fragment_barcode.*
+import org.greenrobot.eventbus.EventBus
 
-class BarcodeActivity : BaseActivity(), Barcode2Adapter.Listener {
+class BarcodeActivity :
+
+    BaseActivity(),
+    Barcode2Adapter.Listener {
 
     private val clipboardManager get() = getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
 
     private val adapter = Barcode2Adapter(mutableListOf(), this)
 
+    private val alertTitleManager = AlertTitleManager()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +66,40 @@ class BarcodeActivity : BaseActivity(), Barcode2Adapter.Listener {
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return true
+    }
+
+    override fun onChangeTitle(barcodeModel: BarcodeModel) {
+        if (isDestroyed || isFinishing) return
+
+        alertTitleManager.createAlert(this, barcodeModel.title) { title ->
+            changedTitle(barcodeModel, title)
+        }
+    }
+
+    private fun changedTitle(barcodeModel: BarcodeModel, title: String) {
+        val database = appBarcode?.database ?: return
+
+        barcodeModel.title = title
+
+        val index = adapter.barcodeModels.indexOfFirst { it.barcode == barcodeModel.barcode }
+        if (index >= 0) {
+            adapter.notifyItemChanged(index)
+        }
+
+        val barcodeData = barcodeModel.barcodeData
+
+        DatabaseManager.executeInBackground(
+            execution = {
+
+                database.barcodeDataDao().replace(barcodeData = barcodeData)
+            },
+
+            resultCallback = {
+
+                EventBus.getDefault().post(ChangedBarcodeData(barcodeData))
+
+            }
+        )
     }
 
     override fun onCopy(barcodeWithDigits: String) {

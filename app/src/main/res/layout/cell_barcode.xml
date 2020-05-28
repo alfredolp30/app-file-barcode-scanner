@@ -11,54 +11,33 @@
                                                        android:layout_height="wrap_content"
                                                        android:layout_margin="16dp">
 
-        <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" android:layout_marginTop="16dp"
-                android:baselineAligned="false">
-            <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:layout_weight="1">
-                <TextView
-                        android:text="@string/pay"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                />
-                <TextView
-                        android:text="10/12/2013"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" android:id="@+id/txtDate"
-                        android:textColor="@android:color/black" android:textSize="16sp"/>
-            </LinearLayout>
-            <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:layout_weight="1">
-                <TextView
-                        android:text="@string/doc_value"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textAlignment="textEnd"/>
-                <TextView
-                        android:text="R$ 1000,00"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" android:id="@+id/txtValue"
-                        android:textAlignment="textEnd" android:textColor="#24890B"
-                        android:textSize="16sp" android:textStyle="bold"/>
-            </LinearLayout>
-        </LinearLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/linearLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+        <TextView
+            android:id="@+id/txtTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableEnd="@drawable/ic_edit"
+            android:drawablePadding="4dp"
+            android:drawableTint="@color/colorAccent"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:clickable="true"
+            android:textColor="@android:color/black"
+            android:nestedScrollingEnabled="true"
+            android:text="@string/invoice_title_default"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            android:focusable="true" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtTitle">
 
             <TextView
                 android:id="@+id/txtBarcode"
@@ -90,6 +69,61 @@
                 app:layout_constraintStart_toEndOf="@+id/txtBarcode"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="16dp"
+            android:baselineAligned="false"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pay" />
+
+                <TextView
+                    android:id="@+id/txtDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="10/12/2013"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/doc_value"
+                    android:textAlignment="textEnd" />
+
+                <TextView
+                    android:id="@+id/txtValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="R$ 1000,00"
+                    android:textAlignment="textEnd"
+                    android:textColor="#24890B"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

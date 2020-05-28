@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.alplabs.filebarcodescanner.R
 import com.alplabs.filebarcodescanner.viewmodel.BarcodeHistoryModel
 import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
+import com.google.android.gms.vision.barcode.Barcode
 import java.lang.ref.WeakReference
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -26,6 +27,7 @@ class Barcode2Adapter(val barcodeModels: MutableList<BarcodeModel>, listener: Li
 
 
     interface Listener {
+        fun onChangeTitle(barcodeModel: BarcodeModel)
         fun onCopy(barcodeWithDigits: String)
         fun onDelete(barcodeModel: BarcodeHistoryModel)
     }
@@ -64,11 +66,17 @@ class Barcode2Adapter(val barcodeModels: MutableList<BarcodeModel>, listener: Li
 
         val barcodeModel = barcodeModels[position]
 
+        val title = barcodeModel.title
         val barcodeWithDigits = barcodeModel.invoice.barcodeWithDigits
         val calendar = barcodeModel.invoice.calendar
         val value = barcodeModel.invoice.value
 
         val ctx = holder.itemView.context
+
+        holder.txtTitle?.text = if (title.isBlank()) ctx.getString(R.string.invoice_title_default) else title
+        holder.txtTitle?.setOnClickListener {
+            weakListener.get()?.onChangeTitle(barcodeModel)
+        }
 
         holder.txtBarcode?.text = barcodeWithDigits
 

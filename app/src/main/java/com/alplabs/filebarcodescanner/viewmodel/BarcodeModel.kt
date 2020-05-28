@@ -12,8 +12,13 @@ import java.util.*
  * Created by Alfredo L. Porfirio on 01/03/19.
  * Copyright Universo Online 2019. All rights reserved.
  */
-open class BarcodeModel(val barcode: String,
-                   protected val calendar: GregorianCalendar?) {
+open class BarcodeModel(
+
+    val barcode: String,
+    protected val calendar: GregorianCalendar?,
+    var title: String = ""
+
+) {
 
     val invoice : InvoiceInterface get() {
         return if (InvoiceChecker(barcode).isCollection) InvoiceCollection(barcode, calendar) else InvoiceBank(barcode)
@@ -26,7 +31,8 @@ open class BarcodeModel(val barcode: String,
             return BarcodeData(
                 barcode = barcode,
                 datetime = calendar?.timeInMillis,
-                readDatetime = GregorianCalendar().timeInMillis
+                readDatetime = GregorianCalendar().timeInMillis,
+                title = title
             )
 
         }
