@@ -1,8 +1,7 @@
 package com.alplabs.filebarcodescanner.metrics
 
 import android.util.Log
-import com.crashlytics.android.Crashlytics
-import io.fabric.sdk.android.Fabric
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 /**
  * Created by Alfredo L. Porfirio on 2019-05-06.
@@ -14,18 +13,13 @@ object CALog {
     private fun logger(level: Int, tag: String, msg: String?, throwable: Throwable?) {
         val message = msg ?: ""
 
+
+        Log.println(level, tag, message)
+        FirebaseCrashlytics.getInstance().log("$tag : $msg")
+
         if (throwable != null) {
-
-            Log.d(tag, message, throwable)
-
-            Fabric.getLogger().log(level, tag, message)
-            Fabric.getLogger().e("EXCEPTION", "", throwable)
-
-        } else {
-
-            Log.d(tag, message)
-
-            Fabric.getLogger().d(tag, message)
+            Log.d("", throwable.message ?: "")
+            FirebaseCrashlytics.getInstance().recordException(throwable)
         }
     }
 
