@@ -11,7 +11,7 @@ import com.alplabs.filebarcodescanner.database.DatabaseManager
 import com.alplabs.filebarcodescanner.eventbus.ChangedBarcodeData
 import com.alplabs.filebarcodescanner.viewmodel.BarcodeHistoryModel
 import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
-import kotlinx.android.synthetic.main.fragment_barcode.*
+import kotlinx.android.synthetic.main.fragment_history_barcode.*
 import org.greenrobot.eventbus.EventBus
 
 class BarcodeActivity :
@@ -33,6 +33,8 @@ class BarcodeActivity :
 
         rcBarcode.layoutManager = LinearLayoutManager(this)
         rcBarcode.adapter = adapter
+
+        txtError.visibility = View.GONE
 
         loadData()
     }

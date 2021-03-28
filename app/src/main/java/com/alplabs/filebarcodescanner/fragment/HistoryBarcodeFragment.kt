@@ -16,13 +16,13 @@ import com.alplabs.filebarcodescanner.database.DatabaseManager
 import com.alplabs.filebarcodescanner.eventbus.*
 import com.alplabs.filebarcodescanner.viewmodel.BarcodeHistoryModel
 import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
-import kotlinx.android.synthetic.main.fragment_barcode.view.*
+import kotlinx.android.synthetic.main.fragment_history_barcode.view.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
 
-class BarcodeFragment :
+class HistoryBarcodeFragment :
     BaseFragment(),
     Barcode2Adapter.Listener {
 
@@ -32,12 +32,18 @@ class BarcodeFragment :
 
     private val alertTitleManager = AlertTitleManager()
 
+    private enum class ViewState {
+        LOADING,
+        FINISH_LOADING,
+        EMPTY
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
 
-        val view = inflater.inflate(R.layout.fragment_barcode, container, false)
+        val view = inflater.inflate(R.layout.fragment_history_barcode, container, false)
 
         view.rcBarcode.layoutManager = LinearLayoutManager(requireContext())
         view.rcBarcode.adapter = adapter
@@ -45,9 +51,33 @@ class BarcodeFragment :
         return view
     }
 
+    private fun setStateView(state: ViewState) {
+
+        when(state) {
+            ViewState.LOADING -> {
+                view?.rcBarcode?.visibility = View.GONE
+                view?.txtError?.visibility = View.GONE
+                view?.progressBar?.visibility = View.VISIBLE
+            }
+
+            ViewState.FINISH_LOADING -> {
+                view?.rcBarcode?.visibility = View.VISIBLE
+                view?.txtError?.visibility = View.GONE
+                view?.progressBar?.visibility = View.GONE
+            }
+
+            ViewState.EMPTY -> {
+                view?.rcBarcode?.visibility = View.GONE
+                view?.txtError?.visibility = View.VISIBLE
+                view?.progressBar?.visibility = View.GONE
+            }
+        }
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        setStateView(ViewState.LOADING)
         loadData()
     }
 
@@ -73,10 +103,15 @@ class BarcodeFragment :
 
             resultCallback = {
 
-                view?.progressBar?.visibility = View.GONE
+                val isEmpty = it?.isEmpty() ?: true
 
-                it?.let{ barcodeModels ->
-                    loadData(barcodeModels)
+                if (isEmpty) {
+                    setStateView(ViewState.EMPTY)
+                } else {
+                    setStateView(ViewState.FINISH_LOADING)
+                    it?.let{ barcodeModels ->
+                        loadData(barcodeModels)
+                    }
                 }
             }
         )
@@ -147,6 +182,9 @@ class BarcodeFragment :
                     adapter.notifyItemRemoved(index)
                 }
 
+                if (adapter.barcodeModels.isEmpty()) {
+                    setStateView(ViewState.EMPTY)
+                }
             }
         )
     }
@@ -165,6 +203,7 @@ class BarcodeFragment :
         adapter.barcodeModels.add(0, barcodeData.toBarcodeHistoryModel())
         adapter.notifyItemInserted(0)
 
+        setStateView(ViewState.FINISH_LOADING)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

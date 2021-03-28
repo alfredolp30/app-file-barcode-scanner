@@ -25,6 +25,7 @@ class BarcodeDetectorManager(context: Context, listener: Listener):
 
     private val weakContext = WeakReference(context)
     private val weakListener = WeakReference(listener)
+    private var detector: DetectorService? = null
 
     interface Listener {
         fun onBarcodeScannerSuccess(barcodeModels: List<BarcodeModel>)
@@ -127,8 +128,8 @@ class BarcodeDetectorManager(context: Context, listener: Listener):
         val ctx = weakContext.get()
 
         if (uris.isNotEmpty() && ctx != null) {
-            val detector = DetectorService(ctx, this, uris = ArrayDeque(uris))
-            detector.start()
+            detector = DetectorService(ctx, listener = this, uris = ArrayDeque(uris))
+            detector?.start()
         } else {
             weakListener.get()?.onBarcodeScannerError()
         }

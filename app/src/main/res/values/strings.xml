@@ -27,4 +27,6 @@
     <string name="invoice_alert_title">Nome</string>
     <string name="hint_alert_title">Escreva um nome</string>
     <string name="invoice_title_default">Sem nome</string>
+
+    <string name="empty_history_invoice">Nenhum boleto</string>
 </resources>

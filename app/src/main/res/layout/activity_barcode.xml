@@ -6,6 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".BarcodeActivity">
 
-    <include layout="@layout/fragment_barcode"/>
+    <include layout="@layout/fragment_history_barcode"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

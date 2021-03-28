@@ -3,6 +3,7 @@ package com.alplabs.filebarcodescanner.scanner
 import android.content.Context
 import android.net.Uri
 import android.os.AsyncTask
+import android.os.Handler
 import com.alplabs.filebarcodescanner.invoice.InvoiceChecker
 import com.alplabs.filebarcodescanner.metrics.CALog
 import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
@@ -14,6 +15,10 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import java.lang.ref.WeakReference
 import java.nio.ByteBuffer
+import kotlin.coroutines.coroutineContext
+import android.os.Looper
+import com.google.j2objc.annotations.Weak
+
 
 /**
  * Created by Alfredo L. Porfirio on 01/03/19.
@@ -106,7 +111,7 @@ private class FirebaseBarcodeDetector {
             }
             .addOnFailureListener { ex ->
 
-                CALog.e( "SCANNER_BARCODE", ex.message, ex)
+                CALog.e("SCANNER_BARCODE", ex.message, ex)
 
                 callback.invoke(null)
             }
@@ -114,31 +119,36 @@ private class FirebaseBarcodeDetector {
 }
 
 
-class AsyncFirebaseBarcodeUriDetector(context: Context, val listener: Listener)
-    : AsyncTask< Uri, Unit, Unit? >() {
 
-    private val weakContext = WeakReference(context)
-
-    private val detector = FirebaseBarcodeDetector()
-
-    override fun doInBackground(vararg params: Uri?): Unit? {
-
-        val uri = params[0]
-        val ctx = weakContext.get()
-
-
-        if (ctx != null && uri != null) {
-            detector.scanner(ctx, uri) { barcodeModel ->
-                listener.onDetectorFinish(barcodeModel)
-            }
-        }
-
-        return null
-
-    }
-
+class ThreadFirebaseBarcodeUriDetector(context: Context, listener: Listener) {
     interface Listener {
         fun onDetectorFinish(barcodeModel: BarcodeModel?)
+    }
+
+    private val weakContext = WeakReference(context)
+    private val weakListener = WeakReference(listener)
+    private val handler = Handler(Looper.getMainLooper())
+
+
+    fun start(uri: Uri) {
+
+        Thread {
+            val ctx = weakContext.get()
+
+            if (ctx == null) {
+                handler.post {
+                    weakListener.get()?.onDetectorFinish(barcodeModel = null)
+                }
+                return@Thread
+            }
+
+            FirebaseBarcodeDetector().scanner(ctx, uri) { barcodeModel ->
+                handler.post {
+                    weakListener.get()?.onDetectorFinish(barcodeModel)
+                }
+            }
+
+        }.run()
     }
 
 }
@@ -149,7 +159,7 @@ class AsyncFirebaseBarcodeBufferDetector(
     private val width: Int,
     private val height: Int
 ):
-    AsyncTask< ByteBuffer, Unit, Unit? >() {
+    AsyncTask<ByteBuffer, Unit, Unit?>() {
 
     private val detector = FirebaseBarcodeDetector()
 

@@ -11,11 +11,12 @@ import java.util.*
  * Copyright Universo Online 2019. All rights reserved.
  */
 class DetectorService(context: Context, listener: Listener, val uris: Queue<Uri>):
-    AsyncFirebaseBarcodeUriDetector.Listener  {
+    ThreadFirebaseBarcodeUriDetector.Listener  {
 
     private val weakContext = WeakReference(context)
     private val weakListener = WeakReference(listener)
     private val totalBarcodeModels = mutableListOf<BarcodeModel>()
+    private val threadFirebaseBarcodeUriDetector = ThreadFirebaseBarcodeUriDetector(context, listener = this)
 
     interface Listener {
         fun onFinishDetectorService(barcodeModels: List<BarcodeModel>)
@@ -23,16 +24,11 @@ class DetectorService(context: Context, listener: Listener, val uris: Queue<Uri>
 
 
     fun start() {
-
-        val ctx = weakContext.get() ?: return
-
         if (uris.isNotEmpty()) {
 
             val uri = uris.remove()
 
-
-            AsyncFirebaseBarcodeUriDetector(context = ctx,
-                                             listener = this).execute(uri)
+            threadFirebaseBarcodeUriDetector.start(uri)
 
         } else {
             weakListener.get()?.onFinishDetectorService(totalBarcodeModels)
