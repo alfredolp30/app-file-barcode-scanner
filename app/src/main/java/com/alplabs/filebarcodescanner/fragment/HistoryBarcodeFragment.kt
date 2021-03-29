@@ -4,6 +4,8 @@ package com.alplabs.filebarcodescanner.fragment
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -187,6 +189,15 @@ class HistoryBarcodeFragment :
                 }
             }
         )
+    }
+
+    override fun onOpenPreview(uri: Uri) {
+        Intent().apply {
+            action = Intent.ACTION_VIEW
+            setDataAndType(uri, "image/*")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            startActivity(this)
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

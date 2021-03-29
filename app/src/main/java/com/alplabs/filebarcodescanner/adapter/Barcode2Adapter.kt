@@ -1,12 +1,18 @@
 package com.alplabs.filebarcodescanner.adapter
 
+import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.alplabs.filebarcodescanner.R
 import com.alplabs.filebarcodescanner.viewmodel.BarcodeHistoryModel
 import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
 import com.google.android.gms.vision.barcode.Barcode
+import com.squareup.picasso.Picasso
+import java.io.File
 import java.lang.ref.WeakReference
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -30,6 +36,7 @@ class Barcode2Adapter(val barcodeModels: MutableList<BarcodeModel>, listener: Li
         fun onChangeTitle(barcodeModel: BarcodeModel)
         fun onCopy(barcodeWithDigits: String)
         fun onDelete(barcodeModel: BarcodeHistoryModel)
+        fun onOpenPreview(uri: Uri)
     }
 
     private enum class ModelType(val type: Int) {
@@ -43,7 +50,7 @@ class Barcode2Adapter(val barcodeModels: MutableList<BarcodeModel>, listener: Li
 
             ModelType.HISTORY.type -> R.layout.cell_barcode_history
 
-            else -> R.layout.cell_barcode
+            else -> R.layout.cell_barcode2
 
 
         }
@@ -72,6 +79,24 @@ class Barcode2Adapter(val barcodeModels: MutableList<BarcodeModel>, listener: Li
         val value = barcodeModel.invoice.value
 
         val ctx = holder.itemView.context
+
+        val previewUri = barcodeModel.pathUri
+        if (previewUri != null && holder.imgPreview != null) {
+            Picasso.get()
+                .load(previewUri)
+                .into(holder.imgPreview)
+
+            holder.imgPreview.setOnClickListener {
+                barcodeModel.pathProviderUri(it.context)?.let { uriProvider ->
+                    weakListener.get()?.onOpenPreview(uriProvider)
+                }
+            }
+
+        } else {
+            holder.imgPreview?.visibility = View.GONE
+        }
+
+
 
         holder.txtTitle?.text = if (title.isBlank()) ctx.getString(R.string.invoice_title_default) else title
         holder.txtTitle?.setOnClickListener {

@@ -33,8 +33,6 @@ class CameraActivity : BaseActivity(), AsyncFirebaseBarcodeBufferDetector.Listen
 
         private val REQUEST_CAMERA_PERMISSION = nextRequestCode()
 
-        const val BARCODE = "barcode"
-
         const val WIDTH = 1280
         const val HEIGHT = 720
 
@@ -129,7 +127,10 @@ class CameraActivity : BaseActivity(), AsyncFirebaseBarcodeBufferDetector.Listen
 
                 if ((frameCounter++ % 30) == 0) {
                     val buffer = image.planes[0].buffer
-                    AsyncFirebaseBarcodeBufferDetector(this, WIDTH, HEIGHT).execute(buffer)
+                    AsyncFirebaseBarcodeBufferDetector(
+                        context = this,
+                        listener = this,
+                        WIDTH, HEIGHT).execute(buffer)
                 }
 
                 image?.close()

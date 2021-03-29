@@ -16,22 +16,25 @@ class BarcodeData(
     val barcode: String,
     val datetime: Long?,
     val readDatetime: Long,
-    val title: String
+    val title: String,
+    val path: String
 
 ) {
 
     fun toBarcodeModel() = BarcodeModel(
-        barcode = barcode,
+        barcode,
         calendar = datetimeToCalendar(datetime),
-        title = title
+        title,
+        path
     )
 
 
     fun toBarcodeHistoryModel() = BarcodeHistoryModel(
-        barcode = barcode,
+        barcode,
         calendar = datetimeToCalendar(datetime),
         readCalendar = datetimeToCalendar(readDatetime),
-        title = title
+        title,
+        path
     )
 
 

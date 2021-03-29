@@ -13,7 +13,6 @@ import java.util.*
 class DetectorService(context: Context, listener: Listener, val uris: Queue<Uri>):
     ThreadFirebaseBarcodeUriDetector.Listener  {
 
-    private val weakContext = WeakReference(context)
     private val weakListener = WeakReference(listener)
     private val totalBarcodeModels = mutableListOf<BarcodeModel>()
     private val threadFirebaseBarcodeUriDetector = ThreadFirebaseBarcodeUriDetector(context, listener = this)

@@ -5,7 +5,6 @@ import android.os.AsyncTask
 import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import java.lang.ref.WeakReference
 
 /**
  * Created by Alfredo L. Porfirio on 2020-01-13.
@@ -21,13 +20,20 @@ object DatabaseManager {
         }
     }
 
+    private val MIGRATION_2_3 = object : Migration(1, 2) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE BarcodeData ADD COLUMN path TEXT NOT NULL DEFAULT('')")
+        }
+    }
+
     fun createDatabase(context: Context) : AppDatabase {
         return Room.databaseBuilder(
-            context,
-            AppDatabase::class.java,
-            DATABASE_NAME
+                context,
+                AppDatabase::class.java,
+                DATABASE_NAME
         ).addMigrations(
-            MIGRATION_1_2
+                MIGRATION_1_2,
+                MIGRATION_2_3
         ).build()
     }
 

@@ -13,19 +13,21 @@ class BarcodeHistoryModel(
     barcode: String,
     calendar: GregorianCalendar?,
     val readCalendar: GregorianCalendar,
-    title: String
+    title: String,
+    path: String
 
-) : BarcodeModel(barcode, calendar, title) {
+) : BarcodeModel(barcode, calendar, title, path) {
 
 
     override val barcodeData : BarcodeData
         get() {
 
             return BarcodeData(
-                barcode = barcode,
+                barcode,
                 datetime = calendar?.timeInMillis,
                 readDatetime = readCalendar.timeInMillis,
-                title = title
+                title,
+                path
             )
 
         }

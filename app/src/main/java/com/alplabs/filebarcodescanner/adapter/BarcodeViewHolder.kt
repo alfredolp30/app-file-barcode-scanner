@@ -2,6 +2,7 @@ package com.alplabs.filebarcodescanner.adapter
 
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.alplabs.filebarcodescanner.R
@@ -11,6 +12,7 @@ import com.alplabs.filebarcodescanner.R
  * Copyright Universo Online 2019. All rights reserved.
  */
 class BarcodeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    val imgPreview : ImageView? = view.findViewById(R.id.imgPreview)
     val txtTitle : TextView? = view.findViewById(R.id.txtTitle)
     val txtBarcode : TextView? = view.findViewById(R.id.txtBarcode)
     val txtDate : TextView? = view.findViewById(R.id.txtDate)

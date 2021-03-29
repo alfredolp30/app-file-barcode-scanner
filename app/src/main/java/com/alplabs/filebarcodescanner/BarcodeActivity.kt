@@ -3,8 +3,11 @@ package com.alplabs.filebarcodescanner
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alplabs.filebarcodescanner.adapter.Barcode2Adapter
 import com.alplabs.filebarcodescanner.database.DatabaseManager
@@ -112,4 +115,14 @@ class BarcodeActivity :
 
     override fun onDelete(barcodeModel: BarcodeHistoryModel) {}
 
+    override fun onOpenPreview(uri: Uri) {
+        Intent().apply {
+            action = Intent.ACTION_VIEW
+            setDataAndType(uri, "image/*")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            startActivity(this)
+        }
+
+
+    }
 }

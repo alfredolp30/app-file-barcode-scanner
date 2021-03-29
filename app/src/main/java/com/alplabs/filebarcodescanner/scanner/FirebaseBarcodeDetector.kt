@@ -1,23 +1,30 @@
 package com.alplabs.filebarcodescanner.scanner
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.Paint
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Handler
+import android.os.Looper
+import android.view.Surface
+import androidx.core.graphics.applyCanvas
 import com.alplabs.filebarcodescanner.invoice.InvoiceChecker
 import com.alplabs.filebarcodescanner.metrics.CALog
 import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
-import com.google.firebase.ml.vision.FirebaseVision
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetector
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
-import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
+import com.google.mlkit.vision.barcode.Barcode
+import com.google.mlkit.vision.barcode.BarcodeScanner
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions
+import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.common.InputImage.IMAGE_FORMAT_YV12
+import com.google.mlkit.vision.text.Text
+import java.io.File
 import java.lang.ref.WeakReference
 import java.nio.ByteBuffer
-import kotlin.coroutines.coroutineContext
-import android.os.Looper
-import com.google.j2objc.annotations.Weak
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 /**
@@ -26,23 +33,23 @@ import com.google.j2objc.annotations.Weak
  */
 private class FirebaseBarcodeDetector {
 
-    private val detector : FirebaseVisionBarcodeDetector by lazy {
+    private val detector : BarcodeScanner by lazy {
 
-        val options = FirebaseVisionBarcodeDetectorOptions.Builder()
-            .setBarcodeFormats(FirebaseVisionBarcode.FORMAT_ITF)
+        val options = BarcodeScannerOptions.Builder()
+            .setBarcodeFormats(Barcode.FORMAT_ITF)
             .build()
 
-        FirebaseVision.getInstance().getVisionBarcodeDetector(options)
+        BarcodeScanning.getClient(options)
     }
 
     private val detectorDate by lazy { FirebaseTextDateDetector() }
 
-    fun scanner(context: Context, uri: Uri, callback: (BarcodeModel?) -> Unit) {
+    fun scannerForArchive(context: Context, uri: Uri, callback: (BarcodeModel?) -> Unit) {
 
         try {
 
-            val image = FirebaseVisionImage.fromFilePath(context, uri)
-            scanner(image, callback)
+            val image = InputImage.fromFilePath(context, uri)
+            scanner(context, image, callback)
 
         } catch (th: Throwable) {
 
@@ -54,19 +61,24 @@ private class FirebaseBarcodeDetector {
     }
 
 
-    fun scanner(buffer: ByteBuffer, width: Int, height: Int, callback: (BarcodeModel?) -> Unit) {
+    fun scannerForCamera(
+        context: Context,
+        buffer: ByteBuffer,
+        width: Int,
+        height: Int,
+        callback: (BarcodeModel?) -> Unit
+    ) {
 
         try {
+            val image = InputImage.fromByteBuffer(
+                buffer,
+                width,
+                height,
+                Surface.ROTATION_270,
+                IMAGE_FORMAT_YV12
+            )
 
-            val metadata = FirebaseVisionImageMetadata.Builder()
-                .setWidth(width)
-                .setHeight(height)
-                .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_YV12)
-                .setRotation(FirebaseVisionImageMetadata.ROTATION_270)
-                .build()
-
-            val image = FirebaseVisionImage.fromByteBuffer(buffer, metadata)
-            scanner(image, callback)
+            scanner(context, image, callback)
 
         } catch (th: Throwable) {
 
@@ -77,28 +89,31 @@ private class FirebaseBarcodeDetector {
     }
 
 
-    private fun scanner(image: FirebaseVisionImage, callback: (BarcodeModel?) -> Unit) {
+    private fun scanner(context: Context, image: InputImage, callback: (BarcodeModel?) -> Unit) {
 
-        detector.detectInImage(image)
+        detector.process(image)
             .addOnSuccessListener { firebaseBarcodes ->
 
                 CALog.d("SCANNER_BARCODE", "" + firebaseBarcodes)
 
-                val barcode = firebaseBarcodes.firstOrNull()?.rawValue
+                val fbarcode = firebaseBarcodes.firstOrNull()
 
-                if (barcode != null) {
-                    val checker = InvoiceChecker(barcode)
+                if (fbarcode != null) {
+                    val barcodeValue = fbarcode.displayValue?.toString() ?: ""
+                    val checker = InvoiceChecker(barcodeValue)
 
                     if (checker.isValid) {
 
                         if (checker.isCollection) {
 
-                            detectorDate.scanner(image) { date ->
-                                callback.invoke(BarcodeModel(barcode, date))
+                            detectorDate.scanner(image) { date, ftextBlock ->
+                                val path = saveImageToFile(context, image, fbarcode, ftextBlock)
+                                callback.invoke(BarcodeModel(barcodeValue, date, path = path))
                             }
 
                         } else {
-                            callback.invoke(BarcodeModel(barcode, null))
+                            val path = saveImageToFile(context, image, fbarcode, firebaseTextBlock = null)
+                            callback.invoke(BarcodeModel(barcodeValue, calendar = null, path = path))
                         }
 
                     } else {
@@ -115,6 +130,52 @@ private class FirebaseBarcodeDetector {
 
                 callback.invoke(null)
             }
+    }
+
+
+
+    private fun saveImageToFile(
+        context: Context,
+        image: InputImage,
+        firebaseBarcode: Barcode,
+        firebaseTextBlock: Text.TextBlock?
+    ) : String {
+
+        val rects = listOf(firebaseBarcode.boundingBox, firebaseTextBlock?.boundingBox)
+        val bitmap = image.bitmapInternal ?: return ""
+
+        val mutableBitmap: Bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+
+        mutableBitmap.applyCanvas {
+            val paint = Paint().apply {
+                color = Color.RED
+                style = Paint.Style.STROKE
+                strokeWidth = 10f
+            }
+
+            rects.filterNotNull().forEach {
+                drawRect(
+                    it.left.toFloat(),
+                    it.top.toFloat(),
+                    it.right.toFloat(),
+                    it.bottom.toFloat(),
+                    paint
+                )
+            }
+
+        }
+
+        val sdf = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-S", Locale("pt", "BR"))
+        val dateStr = sdf.format(GregorianCalendar().time)
+
+        val directory = File(context.filesDir, "barcode")
+        if (!directory.exists()) directory.mkdirs()
+
+        val file = File(directory, "$dateStr.png")
+
+        mutableBitmap.compress(Bitmap.CompressFormat.PNG, 80, file.outputStream())
+
+        return file.absolutePath
     }
 }
 
@@ -142,7 +203,7 @@ class ThreadFirebaseBarcodeUriDetector(context: Context, listener: Listener) {
                 return@Thread
             }
 
-            FirebaseBarcodeDetector().scanner(ctx, uri) { barcodeModel ->
+            FirebaseBarcodeDetector().scannerForArchive(ctx, uri) { barcodeModel ->
                 handler.post {
                     weakListener.get()?.onDetectorFinish(barcodeModel)
                 }
@@ -155,6 +216,7 @@ class ThreadFirebaseBarcodeUriDetector(context: Context, listener: Listener) {
 
 
 class AsyncFirebaseBarcodeBufferDetector(
+    context: Context,
     val listener: Listener,
     private val width: Int,
     private val height: Int
@@ -162,14 +224,15 @@ class AsyncFirebaseBarcodeBufferDetector(
     AsyncTask<ByteBuffer, Unit, Unit?>() {
 
     private val detector = FirebaseBarcodeDetector()
+    private val weakContext = WeakReference(context)
 
     override fun doInBackground(vararg params: ByteBuffer?): Unit? {
 
         val buffer = params[0]
+        val ctx = weakContext.get()
 
-
-        buffer?.let {
-            detector.scanner(it, width, height) { barcodeModel ->
+        if (buffer != null && ctx != null) {
+            detector.scannerForCamera(ctx, buffer, width, height) { barcodeModel ->
                 listener.onDetectorFinish(barcodeModel)
             }
         }
