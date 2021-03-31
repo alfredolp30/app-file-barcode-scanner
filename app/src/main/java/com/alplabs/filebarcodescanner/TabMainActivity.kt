@@ -7,13 +7,12 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import com.alplabs.filebarcodescanner.database.DatabaseManager
 import com.alplabs.filebarcodescanner.fragment.InitialFragment
 import com.alplabs.filebarcodescanner.metrics.CALog
 import com.alplabs.filebarcodescanner.ui.main.SectionsPagerAdapter
 import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
-import com.google.android.gms.vision.barcode.Barcode
 import kotlinx.android.synthetic.main.activity_tab_main.*
+import java.lang.ref.WeakReference
 
 
 open class TabMainActivity :
@@ -27,8 +26,9 @@ open class TabMainActivity :
 
     }
 
+    private var checkFile = false
     private var bdm = BarcodeDetectorManager(context = this, listener = this)
-    private var alert: AlertDialog? = null
+    private var weakAlert: WeakReference<AlertDialog?>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +38,8 @@ open class TabMainActivity :
 
         viewPager.adapter = sectionsPagerAdapter
         tabs.setupWithViewPager(viewPager)
+
+        if (checkFile) return
 
         when (intent?.action) {
             Intent.ACTION_VIEW -> {
@@ -54,6 +56,8 @@ open class TabMainActivity :
                 }
             }
         }
+
+        checkFile = true
     }
 
 
@@ -123,7 +127,7 @@ open class TabMainActivity :
 
     override fun onBarcodeScannerSuccess(barcodeModels: List<BarcodeModel>) {
 
-        alert?.hide()
+        weakAlert?.get()?.dismiss()
 
 
         if (barcodeModels.isEmpty()) {
@@ -139,7 +143,7 @@ open class TabMainActivity :
 
     override fun onBarcodeScannerError(error: Error?) {
 
-        alert?.hide()
+        weakAlert?.get()?.dismiss()
 
         val errorMsg: String = error?.localizedMessage ?: getString(R.string.unknown_error)
 
@@ -162,10 +166,10 @@ open class TabMainActivity :
         }
 
 
-        alert = alertBuilder.create()
+        weakAlert = WeakReference(alertBuilder.create())
 
         if (!isDestroyed && !isFinishing) {
-            alert?.show()
+            weakAlert?.get()?.show()
             bdm.start(uri)
         }
 

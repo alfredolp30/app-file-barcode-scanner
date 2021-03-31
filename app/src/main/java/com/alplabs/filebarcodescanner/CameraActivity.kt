@@ -14,12 +14,13 @@ import android.os.HandlerThread
 import com.alplabs.filebarcodescanner.metrics.CALog
 import android.media.ImageReader.OnImageAvailableListener
 import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
-import com.alplabs.filebarcodescanner.scanner.AsyncFirebaseBarcodeBufferDetector
-import android.content.Intent
 import android.media.ImageReader.newInstance
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import com.alplabs.filebarcodescanner.scanner.ThreadFirebaseBarcode
+import com.alplabs.filebarcodescanner.scanner.ThreadFirebaseBarcodeCameraDetector
+import com.alplabs.filebarcodescanner.scanner.ThreadFirebaseBarcodeUriDetector
 
 
 import kotlinx.android.synthetic.main.activity_camera.*
@@ -27,7 +28,7 @@ import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 
 
-class CameraActivity : BaseActivity(), AsyncFirebaseBarcodeBufferDetector.Listener {
+class CameraActivity : BaseActivity(), ThreadFirebaseBarcode.Listener {
 
     companion object {
 
@@ -127,10 +128,9 @@ class CameraActivity : BaseActivity(), AsyncFirebaseBarcodeBufferDetector.Listen
 
                 if ((frameCounter++ % 30) == 0) {
                     val buffer = image.planes[0].buffer
-                    AsyncFirebaseBarcodeBufferDetector(
+                    ThreadFirebaseBarcodeCameraDetector(
                         context = this,
-                        listener = this,
-                        WIDTH, HEIGHT).execute(buffer)
+                        listener = this).start(buffer, WIDTH, HEIGHT)
                 }
 
                 image?.close()

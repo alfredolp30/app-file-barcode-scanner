@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Paint
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Handler
 import android.os.Looper
 import android.view.Surface
@@ -31,7 +30,7 @@ import java.util.*
  * Created by Alfredo L. Porfirio on 01/03/19.
  * Copyright Universo Online 2019. All rights reserved.
  */
-private class FirebaseBarcodeDetector {
+class FirebaseBarcodeDetector {
 
     private val detector : BarcodeScanner by lazy {
 
@@ -74,7 +73,7 @@ private class FirebaseBarcodeDetector {
                 buffer,
                 width,
                 height,
-                Surface.ROTATION_270,
+                Surface.ROTATION_270 * 90,
                 IMAGE_FORMAT_YV12
             )
 
@@ -180,15 +179,20 @@ private class FirebaseBarcodeDetector {
 }
 
 
-
-class ThreadFirebaseBarcodeUriDetector(context: Context, listener: Listener) {
+open class ThreadFirebaseBarcode(context: Context, listener: Listener) {
     interface Listener {
         fun onDetectorFinish(barcodeModel: BarcodeModel?)
     }
 
-    private val weakContext = WeakReference(context)
-    private val weakListener = WeakReference(listener)
-    private val handler = Handler(Looper.getMainLooper())
+    protected val weakContext = WeakReference(context)
+    protected val weakListener = WeakReference(listener)
+    protected val handler = Handler(Looper.getMainLooper())
+    protected val barcodeDetector = FirebaseBarcodeDetector()
+}
+
+
+class ThreadFirebaseBarcodeUriDetector(context: Context, listener: Listener)
+    : ThreadFirebaseBarcode(context, listener) {
 
 
     fun start(uri: Uri) {
@@ -203,7 +207,7 @@ class ThreadFirebaseBarcodeUriDetector(context: Context, listener: Listener) {
                 return@Thread
             }
 
-            FirebaseBarcodeDetector().scannerForArchive(ctx, uri) { barcodeModel ->
+            barcodeDetector.scannerForArchive(ctx, uri) { barcodeModel ->
                 handler.post {
                     weakListener.get()?.onDetectorFinish(barcodeModel)
                 }
@@ -215,33 +219,26 @@ class ThreadFirebaseBarcodeUriDetector(context: Context, listener: Listener) {
 }
 
 
-class AsyncFirebaseBarcodeBufferDetector(
-    context: Context,
-    val listener: Listener,
-    private val width: Int,
-    private val height: Int
-):
-    AsyncTask<ByteBuffer, Unit, Unit?>() {
+class ThreadFirebaseBarcodeCameraDetector(context: Context, listener: Listener)
+    : ThreadFirebaseBarcode(context, listener) {
 
-    private val detector = FirebaseBarcodeDetector()
-    private val weakContext = WeakReference(context)
+    fun start(byteBuffer: ByteBuffer, width: Int, height: Int) {
+        Thread {
+            val ctx = weakContext.get()
 
-    override fun doInBackground(vararg params: ByteBuffer?): Unit? {
-
-        val buffer = params[0]
-        val ctx = weakContext.get()
-
-        if (buffer != null && ctx != null) {
-            detector.scannerForCamera(ctx, buffer, width, height) { barcodeModel ->
-                listener.onDetectorFinish(barcodeModel)
+            if (ctx == null) {
+                handler.post {
+                    weakListener.get()?.onDetectorFinish(barcodeModel = null)
+                }
+                return@Thread
             }
-        }
 
-        return null
+            barcodeDetector.scannerForCamera(ctx, byteBuffer, width, height) { barcodeModel ->
+                handler.post {
+                    weakListener.get()?.onDetectorFinish(barcodeModel)
+                }
+            }
 
-    }
-
-    interface Listener {
-        fun onDetectorFinish(barcodeModel: BarcodeModel?)
+        }.run()
     }
 }

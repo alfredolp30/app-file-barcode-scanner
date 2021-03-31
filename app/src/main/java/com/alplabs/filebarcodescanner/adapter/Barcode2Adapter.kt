@@ -1,18 +1,14 @@
 package com.alplabs.filebarcodescanner.adapter
 
-import android.content.Intent
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.alplabs.filebarcodescanner.R
 import com.alplabs.filebarcodescanner.viewmodel.BarcodeHistoryModel
 import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
-import com.google.android.gms.vision.barcode.Barcode
 import com.squareup.picasso.Picasso
-import java.io.File
 import java.lang.ref.WeakReference
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -48,7 +44,7 @@ class Barcode2Adapter(val barcodeModels: MutableList<BarcodeModel>, listener: Li
 
         val layout = when (viewType) {
 
-            ModelType.HISTORY.type -> R.layout.cell_barcode_history
+            ModelType.HISTORY.type -> R.layout.cell_barcode_history2
 
             else -> R.layout.cell_barcode2
 
@@ -84,6 +80,7 @@ class Barcode2Adapter(val barcodeModels: MutableList<BarcodeModel>, listener: Li
         if (previewUri != null && holder.imgPreview != null) {
             Picasso.get()
                 .load(previewUri)
+                .resizeDimen(R.dimen.preview_image_width,  R.dimen.preview_image_height)
                 .into(holder.imgPreview)
 
             holder.imgPreview.setOnClickListener {

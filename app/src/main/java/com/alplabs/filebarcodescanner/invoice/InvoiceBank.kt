@@ -3,7 +3,6 @@ package com.alplabs.filebarcodescanner.invoice
 import com.alplabs.filebarcodescanner.extension.addSubstring
 import com.alplabs.filebarcodescanner.extension.digitToInt
 import java.util.*
-import kotlin.math.abs
 
 /**
  * Created by Alfredo L. Porfirio on 2019-05-31.
