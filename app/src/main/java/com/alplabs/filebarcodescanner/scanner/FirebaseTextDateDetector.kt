@@ -36,18 +36,20 @@ class FirebaseTextDateDetector {
             detector.process(image)
                 .addOnSuccessListener { firebaseText ->
 
+                    val dates = mutableMapOf<Text.TextBlock, GregorianCalendar?>()
+
                     firebaseText.textBlocks.forEach {
-
-                        val dates = findDates(it.text)
-
-                        if (dates.isNotEmpty()) {
-                            val date = dates.maxOrNull()
-                            callback.invoke(date, it)
-
-                        } else {
-                            callback.invoke(null, null)
-                        }
+                        dates[it] = findDate(it.text)
                     }
+
+                    val date = dates.maxByOrNull { it.value?.timeInMillis ?: 0 }
+
+                    if (date?.value != null) {
+                        callback.invoke(date.value, date.key)
+                    } else {
+                        callback.invoke(null, null)
+                    }
+
                 }
                 .addOnFailureListener { e ->
                     CALog.e("FirebaseTextDateDetector::scanner", e.message, e)
@@ -63,35 +65,29 @@ class FirebaseTextDateDetector {
     }
 
 
-    private fun findDates(text: String) : List<GregorianCalendar> {
+    private fun findDate(text: String) : GregorianCalendar? {
 
         val result = dateRegex.find(text)
 
-        return result?.groupValues?.map {
+       result?.groupValues?.forEach {
+           var date: Date? = null
 
+           try { date = largeDateFormat.parse(it) } catch (e: Exception) {}
 
-            val calendar = GregorianCalendar()
+           if (date == null) {
+               try { date = dateFormat.parse(it) } catch (e: Exception) {}
+           }
 
-            calendar.apply {
-                try {
-                    val date = if (it.contains(" ")) {
-                        largeDateFormat.parse(it)
-                    } else {
-                        dateFormat.parse(it)
-                    }
+           date?.let {
+               val calendar = GregorianCalendar().apply {
+                   time = date
+               }
 
-                    date?.let {
-                        time = date
-                    }
+               return calendar
+           }
+        }
 
-                } catch (ex: ParseException) {
-                    CALog.e("FirebaseTextDateDetector::scanner", ex.message, ex)
-                    return@map null
-                }
-            }
-
-            calendar
-        }?.filterNotNull() ?: listOf()
+        return null
     }
 
 

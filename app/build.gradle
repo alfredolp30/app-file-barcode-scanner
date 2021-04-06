@@ -27,8 +27,8 @@ android {
         applicationId "com.alplabs.filebarcodescanner"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 30
-        versionName "3.2"
+        versionCode 31
+        versionName "3.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.signed
     }
