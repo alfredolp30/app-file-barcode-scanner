@@ -14,3 +14,6 @@
 .idea
 fastlane/README.md
 fastlane/report.xml
+client_secret.json
+app/alplabs_release.keystore
+app/google-services.json
