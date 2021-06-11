@@ -93,11 +93,7 @@ class AsyncPdf2Bitmap(context: Context, listener: Listener) :
                     val width = core.getPageWidth(pdfDocument, page)
                     val height = core.getPageHeight(pdfDocument, page)
 
-                    val metrics = DisplayMetrics()
-                    metrics.setToDefaults()
-
                     val bitmap = Bitmap.createBitmap(
-                        metrics,
                         width, height,
                         Bitmap.Config.ARGB_8888
                     )
