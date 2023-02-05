@@ -1,9 +1,8 @@
 package com.alplabs.filebarcodescanner.database.model
 
 import androidx.room.Entity
-import androidx.room.Ignore
-import com.alplabs.filebarcodescanner.viewmodel.BarcodeHistoryModel
-import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
+import com.alplabs.filebarcodescanner.model.BarcodeHistoryModel
+import com.alplabs.filebarcodescanner.model.BarcodeModel
 import java.util.*
 
 /**

@@ -8,9 +8,10 @@ import android.os.Parcelable
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.alplabs.filebarcodescanner.fragment.InitialFragment
+import com.alplabs.filebarcodescanner.metrics.CAAnalytics
 import com.alplabs.filebarcodescanner.metrics.CALog
-import com.alplabs.filebarcodescanner.ui.main.SectionsPagerAdapter
-import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
+import com.alplabs.filebarcodescanner.model.BarcodeModel
+import com.alplabs.filebarcodescanner.section.SectionsPagerAdapter
 import kotlinx.android.synthetic.main.activity_tab_main.*
 import java.lang.ref.WeakReference
 
@@ -134,10 +135,13 @@ open class TabMainActivity :
 
             showToast(getString(R.string.not_found_barcode), Toast.LENGTH_LONG)
 
+            appBarcode?.analytics?.eventInvoiceFinished(founded = false)
+
         } else {
 
             saveBarcodeAndShow(barcodeModels)
 
+            appBarcode?.analytics?.eventInvoiceFinished(founded = true)
         }
     }
 
@@ -146,6 +150,8 @@ open class TabMainActivity :
         weakAlert?.get()?.dismiss()
 
         val errorMsg: String = error?.localizedMessage ?: getString(R.string.unknown_error)
+
+        appBarcode?.analytics?.eventInvoiceFinished(founded = false)
 
         showToast(errorMsg, Toast.LENGTH_LONG)
 

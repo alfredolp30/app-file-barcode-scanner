@@ -7,10 +7,9 @@ import android.view.LayoutInflater
 import android.webkit.MimeTypeMap
 import android.widget.EditText
 import com.alplabs.filebarcodescanner.metrics.CALog
-import com.alplabs.filebarcodescanner.scanner.AsyncHtml2Bitmap
 import com.alplabs.filebarcodescanner.scanner.AsyncPdf2Bitmap
 import com.alplabs.filebarcodescanner.scanner.DetectorService
-import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
+import com.alplabs.filebarcodescanner.model.BarcodeModel
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -19,7 +18,6 @@ import java.util.*
  * Copyright Universo Online 2020. All rights reserved.
  */
 class BarcodeDetectorManager(context: Context, listener: Listener):
-    AsyncHtml2Bitmap.Listener,
     AsyncPdf2Bitmap.Listener,
     DetectorService.Listener {
 
@@ -47,10 +45,6 @@ class BarcodeDetectorManager(context: Context, listener: Listener):
 
             "jpeg", "png", "jpg", "bmp" -> {
                 scannerBarcode(listOf(uri))
-            }
-
-            "htm" -> {
-                html2Bitmap(uri)
             }
 
             else -> {
@@ -100,27 +94,6 @@ class BarcodeDetectorManager(context: Context, listener: Listener):
         }
 
         alert.show()
-    }
-
-
-    private fun html2Bitmap(htmlUri: Uri) {
-        val ctx = weakContext.get()
-
-        if (ctx != null) {
-            AsyncHtml2Bitmap(ctx, this).execute(htmlUri)
-        } else {
-            weakListener.get()?.onBarcodeScannerError()
-        }
-
-    }
-
-    override fun onFinishHtml2Bitmap(uri: Uri?) {
-
-        if (uri != null) {
-            scannerBarcode(listOf(uri))
-        } else {
-            weakListener.get()?.onBarcodeScannerError()
-        }
     }
 
 

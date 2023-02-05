@@ -4,6 +4,9 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.solver.state.State
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.Constraints
 import androidx.recyclerview.widget.RecyclerView
 import com.alplabs.filebarcodescanner.R
 
@@ -20,4 +23,5 @@ class BarcodeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     val btnCopy : Button? = view.findViewById(R.id.btnCopy)
     val txtRead : TextView? = view.findViewById(R.id.txtRead)
     val btnDelete : Button? = view.findViewById(R.id.btnDelete)
+    val constraintEnd : ConstraintLayout? = view.findViewById(R.id.constraintEnd)
 }

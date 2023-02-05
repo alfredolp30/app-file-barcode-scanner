@@ -7,75 +7,95 @@
                                    android:gravity="center_vertical" app:cardBackgroundColor="@android:color/white"
                                    android:layout_margin="8dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
-                                                       android:layout_height="wrap_content"
-                                                       android:layout_margin="16dp">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp">
+
+        <ImageView
+            android:id="@+id/imgPreview"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/preview_image_height"
+            android:layout_marginTop="8dp"
+            android:elevation="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/constraintLayout"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/avatars" />
 
         <TextView
             android:id="@+id/txtTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableEnd="@drawable/ic_edit"
-            android:drawablePadding="4dp"
-            android:drawableTint="@color/colorAccent"
-            android:ellipsize="end"
-            android:maxLines="1"
+            android:layout_marginTop="16dp"
             android:clickable="true"
-            android:textColor="@android:color/black"
+            android:drawablePadding="4dp"
+            android:ellipsize="end"
+            android:focusable="true"
+            android:maxLines="1"
             android:nestedScrollingEnabled="true"
             android:text="@string/invoice_title_default"
+            android:textColor="@android:color/black"
             android:textSize="16sp"
+            app:drawableEndCompat="@drawable/ic_edit"
+            app:drawableTint="@color/colorAccent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:focusable="true" />
+            app:layout_constraintTop_toBottomOf="@id/imgPreview" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintEnd"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="8dp"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:orientation="horizontal"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout4">
 
-            <TextView
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/btnDelete"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/was_read_in"
-                android:textAlignment="viewEnd" />
+                android:background="@android:color/transparent"
+                android:drawableStart="@drawable/ic_delete"
+                android:drawablePadding="16dp"
+                android:drawableTint="@color/colorDelete"
+                android:paddingLeft="0dp"
+                android:paddingRight="0dp"
+                android:text="@string/delete"
+                android:textColor="@color/colorDelete"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/txtRead"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="10/12/2013"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
-        </LinearLayout>
+            <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-        <Button
-            android:id="@+id/btnDelete"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:background="@drawable/layer_button_delete_background"
-            android:drawableStart="@drawable/ic_delete"
-            android:drawablePadding="16dp"
-            android:foreground="?attr/selectableItemBackground"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:text="@string/delete"
-            android:textColor="@android:color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/was_read_in"
+                    android:textAlignment="viewEnd" />
+
+                <TextView
+                    android:id="@+id/txtRead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="10/12/2013"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@+id/txtTitle">
 
             <TextView
@@ -112,7 +132,7 @@
         <LinearLayout
             android:id="@+id/linearLayout4"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:baselineAligned="false"
             android:orientation="horizontal"

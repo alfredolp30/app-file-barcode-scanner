@@ -18,7 +18,7 @@
 
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"
-            android:value="ocr" />
+            android:value="ocr,barcode" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -34,7 +34,8 @@
         <activity
             android:name=".TabMainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -46,12 +47,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:host="*" />
                 <data android:scheme="file" />
                 <data android:scheme="smb" />
                 <data android:scheme="content" />
-                <data android:scheme="http" />
-                <data android:scheme="https" />
                 <data android:mimeType="image/jpg" />
                 <data android:mimeType="image/png" />
                 <data android:mimeType="image/jpeg" />
@@ -62,7 +60,8 @@
         <activity
             android:name=".BarcodeSendActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
 
@@ -79,12 +78,14 @@
         <activity
             android:name=".CameraActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.FullScreen" />
+            android:theme="@style/AppTheme.FullScreen"
+            android:exported="false" />
 
         <activity
             android:name=".BarcodeActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"  />
+            android:theme="@style/AppTheme"
+            android:exported="false" />
 
         <meta-data
             android:name="com.google.firebase.ml.vision.DEPENDENCIES"

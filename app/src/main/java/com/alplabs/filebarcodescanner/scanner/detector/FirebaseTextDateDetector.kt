@@ -1,11 +1,11 @@
-package com.alplabs.filebarcodescanner.scanner
+package com.alplabs.filebarcodescanner.scanner.detector
 
 
 import com.alplabs.filebarcodescanner.metrics.CALog
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
-import java.text.ParseException
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -14,9 +14,13 @@ import java.util.*
  * Copyright Universo Online 2019. All rights reserved.
  */
 class FirebaseTextDateDetector {
-    private val detector = TextRecognition.getClient()
+    private val detector = TextRecognition.getClient(
+        TextRecognizerOptions.DEFAULT_OPTIONS
+    )
 
-    private val LOCALE = Locale("pt", "BR")
+    companion object {
+        private val LOCALE = Locale("pt", "BR")
+    }
 
     private val dateFormat by lazy { SimpleDateFormat("dd/MM/yyyy", LOCALE) }
     private val largeDateFormat by lazy { SimpleDateFormat("dd MMM yyyy", LOCALE) }
@@ -31,7 +35,6 @@ class FirebaseTextDateDetector {
     }
 
     fun scanner(image: InputImage, callback: (GregorianCalendar?, textBlock: Text.TextBlock?) -> Unit) {
-
         try {
             detector.process(image)
                 .addOnSuccessListener { firebaseText ->
@@ -61,7 +64,6 @@ class FirebaseTextDateDetector {
             CALog.e("FirebaseTextDateDetector::scanner", th.message, th)
             callback.invoke(null, null)
         }
-
     }
 
 

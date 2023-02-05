@@ -1,4 +1,4 @@
-package com.alplabs.filebarcodescanner.ui.main
+package com.alplabs.filebarcodescanner.section
 
 import android.content.Context
 import androidx.fragment.app.Fragment

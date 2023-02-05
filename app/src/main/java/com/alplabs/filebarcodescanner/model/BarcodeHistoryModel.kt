@@ -1,4 +1,4 @@
-package com.alplabs.filebarcodescanner.viewmodel
+package com.alplabs.filebarcodescanner.model
 
 
 import com.alplabs.filebarcodescanner.database.model.BarcodeData

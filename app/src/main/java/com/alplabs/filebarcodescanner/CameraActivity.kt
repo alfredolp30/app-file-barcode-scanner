@@ -2,7 +2,6 @@ package com.alplabs.filebarcodescanner
 
 import android.os.Bundle
 import android.Manifest.permission
-import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager.PERMISSION_DENIED
 import androidx.core.app.ActivityCompat
@@ -13,14 +12,12 @@ import android.os.Handler
 import android.os.HandlerThread
 import com.alplabs.filebarcodescanner.metrics.CALog
 import android.media.ImageReader.OnImageAvailableListener
-import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
+import com.alplabs.filebarcodescanner.model.BarcodeModel
 import android.media.ImageReader.newInstance
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import com.alplabs.filebarcodescanner.scanner.ThreadFirebaseBarcode
-import com.alplabs.filebarcodescanner.scanner.ThreadFirebaseBarcodeCameraDetector
-import com.alplabs.filebarcodescanner.scanner.ThreadFirebaseBarcodeUriDetector
+import com.alplabs.filebarcodescanner.scanner.WorkerFirebaseBarcodeDetector
 
 
 import kotlinx.android.synthetic.main.activity_camera.*
@@ -28,7 +25,7 @@ import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 
 
-class CameraActivity : BaseActivity(), ThreadFirebaseBarcode.Listener {
+class CameraActivity : BaseActivity(), WorkerFirebaseBarcodeDetector.Listener {
 
     companion object {
 
@@ -57,7 +54,7 @@ class CameraActivity : BaseActivity(), ThreadFirebaseBarcode.Listener {
 
 
     private val surface: Surface by lazy {
-        textureView.surfaceTexture.setDefaultBufferSize(WIDTH, HEIGHT)
+        textureView.surfaceTexture?.setDefaultBufferSize(WIDTH, HEIGHT)
         Surface(textureView.surfaceTexture)
     }
 
@@ -127,10 +124,10 @@ class CameraActivity : BaseActivity(), ThreadFirebaseBarcode.Listener {
                 val image = reader.acquireLatestImage()
 
                 if ((frameCounter++ % 30) == 0) {
-                    val buffer = image.planes[0].buffer
-                    ThreadFirebaseBarcodeCameraDetector(
+                    WorkerFirebaseBarcodeDetector(
                         context = this,
-                        listener = this).start(buffer, WIDTH, HEIGHT)
+                        listener = this
+                    ).start(image)
                 }
 
                 image?.close()
@@ -149,7 +146,6 @@ class CameraActivity : BaseActivity(), ThreadFirebaseBarcode.Listener {
         setContentView(R.layout.activity_camera)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-
 
         val anim = AnimationUtils.loadAnimation(this, R.anim.translate_divider_camera)
         anim.repeatCount = Animation.INFINITE

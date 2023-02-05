@@ -13,11 +13,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alplabs.filebarcodescanner.AlertTitleManager
 import com.alplabs.filebarcodescanner.R
-import com.alplabs.filebarcodescanner.adapter.Barcode2Adapter
+import com.alplabs.filebarcodescanner.adapter.BarcodeAdapter
 import com.alplabs.filebarcodescanner.database.DatabaseManager
 import com.alplabs.filebarcodescanner.eventbus.*
-import com.alplabs.filebarcodescanner.viewmodel.BarcodeHistoryModel
-import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
+import com.alplabs.filebarcodescanner.model.BarcodeHistoryModel
+import com.alplabs.filebarcodescanner.model.BarcodeModel
 import kotlinx.android.synthetic.main.fragment_history_barcode.view.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -26,11 +26,11 @@ import org.greenrobot.eventbus.ThreadMode
 
 class HistoryBarcodeFragment :
     BaseFragment(),
-    Barcode2Adapter.Listener {
+    BarcodeAdapter.Listener {
 
     private val clipboardManager get() = context?.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
 
-    private val adapter = Barcode2Adapter(mutableListOf(), this)
+    private val adapter = BarcodeAdapter(mutableListOf(), this)
 
     private val alertTitleManager = AlertTitleManager()
 

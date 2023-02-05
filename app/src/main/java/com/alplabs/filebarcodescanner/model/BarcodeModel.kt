@@ -1,4 +1,4 @@
-package com.alplabs.filebarcodescanner.viewmodel
+package com.alplabs.filebarcodescanner.model
 
 import android.content.Context
 import android.net.Uri
@@ -26,10 +26,12 @@ open class BarcodeModel(
 ) {
 
     val invoice : InvoiceInterface get() {
-        return if (InvoiceChecker(barcode).isCollection)
-            InvoiceCollection(barcode, calendar)
-        else
-            InvoiceBank(barcode)
+        val checker = InvoiceChecker(barcode)
+
+        return when {
+            checker.isBarcodeCollection -> InvoiceCollection(barcode, calendar)
+            else -> InvoiceBank(barcode)
+        }
     }
 
 

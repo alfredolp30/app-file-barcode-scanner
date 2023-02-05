@@ -5,6 +5,10 @@ package com.alplabs.filebarcodescanner.invoice
  * Copyright Universo Online 2019. All rights reserved.
  */
 class InvoiceChecker(barcode: String) {
-    val isValid = barcode.length == 44 && barcode.dropWhile { it.isDigit() }.isEmpty()
-    val isCollection = isValid && barcode[0] == '8'
+    private val containsOnlyDigits = barcode.all { it.isDigit() }
+    private val isBarcode = barcode.length == 44 && containsOnlyDigits
+
+    val isBarcodeBank = isBarcode
+    val isBarcodeCollection = isBarcode && barcode[0] == '8'
+
 }

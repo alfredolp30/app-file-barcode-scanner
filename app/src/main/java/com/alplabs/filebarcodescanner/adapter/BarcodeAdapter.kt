@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.alplabs.filebarcodescanner.R
-import com.alplabs.filebarcodescanner.viewmodel.BarcodeHistoryModel
-import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
+import com.alplabs.filebarcodescanner.model.BarcodeHistoryModel
+import com.alplabs.filebarcodescanner.model.BarcodeModel
 import com.squareup.picasso.Picasso
 import java.lang.ref.WeakReference
 import java.text.DecimalFormat
@@ -18,7 +18,7 @@ import java.util.*
  * Created by Alfredo L. Porfirio on 01/03/19.
  * Copyright Universo Online 2019. All rights reserved.
  */
-class Barcode2Adapter(val barcodeModels: MutableList<BarcodeModel>, listener: Listener)
+class BarcodeAdapter(val barcodeModels: MutableList<BarcodeModel>, listener: Listener)
     : RecyclerView.Adapter<BarcodeViewHolder>() {
 
     private val weakListener = WeakReference(listener)
@@ -35,35 +35,12 @@ class Barcode2Adapter(val barcodeModels: MutableList<BarcodeModel>, listener: Li
         fun onOpenPreview(uri: Uri)
     }
 
-    private enum class ModelType(val type: Int) {
-        NORMAL(1),
-        HISTORY(2)
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BarcodeViewHolder {
-
-        val layout = when (viewType) {
-
-            ModelType.HISTORY.type -> R.layout.cell_barcode_history2
-
-            else -> R.layout.cell_barcode2
-
-
-        }
-
-        val view = LayoutInflater.from(parent.context).inflate(layout, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.cell_barcode_history, parent, false)
         return BarcodeViewHolder(view)
     }
 
     override fun getItemCount(): Int = barcodeModels.count()
-
-    override fun getItemViewType(position: Int): Int {
-        return if (barcodeModels[position] is BarcodeHistoryModel) {
-            ModelType.HISTORY.type
-        } else {
-            ModelType.NORMAL.type
-        }
-    }
 
     override fun onBindViewHolder(holder: BarcodeViewHolder, position: Int) {
 
@@ -93,7 +70,11 @@ class Barcode2Adapter(val barcodeModels: MutableList<BarcodeModel>, listener: Li
             holder.imgPreview?.visibility = View.GONE
         }
 
-
+        holder.constraintEnd?.visibility = if (barcodeModel is BarcodeHistoryModel) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
 
         holder.txtTitle?.text = if (title.isBlank()) ctx.getString(R.string.invoice_title_default) else title
         holder.txtTitle?.setOnClickListener {

@@ -6,7 +6,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.alplabs.filebarcodescanner.database.DatabaseManager
 import com.alplabs.filebarcodescanner.eventbus.NewBarcodeData
-import com.alplabs.filebarcodescanner.viewmodel.BarcodeModel
+import com.alplabs.filebarcodescanner.model.BarcodeModel
 import org.greenrobot.eventbus.EventBus
 
 /**

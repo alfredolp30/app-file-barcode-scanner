@@ -25,9 +25,7 @@ import com.shockwave.pdfium.PdfPasswordException
  * Copyright Universo Online 2019. All rights reserved.
  */
 class AsyncPdf2Bitmap(context: Context, listener: Listener) :
-    AsyncTask<AsyncPdf2Bitmap.WorkPdf,
-    Unit,
-    AsyncPdf2Bitmap.DataResult>() {
+    AsyncTask<AsyncPdf2Bitmap.WorkPdf, Unit, AsyncPdf2Bitmap.DataResult>() {
 
     interface Listener {
         fun onFinishPdf2Bitmap(uris: List<Uri>)
